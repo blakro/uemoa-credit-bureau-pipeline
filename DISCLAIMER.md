@@ -1,8 +1,7 @@
 # Avertissement
 
-Ce dépôt est un **projet portfolio personnel**, réalisé dans le cadre d'une
-candidature à un poste d'analyste de données. Il n'est affilié à, ni
-approuvé par, aucune institution réelle.
+Ce dépôt est un **projet personnel de démonstration technique**. Il n'est
+affilié à, ni approuvé par, aucune institution réelle.
 
 ## Données 100 % synthétiques
 

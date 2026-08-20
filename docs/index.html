@@ -3,376 +3,1154 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Tableau de bord — Pipeline BIC UEMOA</title>
+<title>Centrale des risques — Tableau de bord</title>
+<meta name="description" content="Tableau de bord d'une simulation de centrale des risques (BIC) : qualité des déclarations bancaires, consolidation des identités et score de solvabilité. Données synthétiques." />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bleu-fonce: #0b2e4f;
-    --bleu: #1d5b8a;
-    --bleu-clair: #4f8fbf;
-    --gris-fonce: #24303b;
-    --gris: #5b6b78;
-    --gris-clair: #eef1f4;
-    --blanc: #ffffff;
-    --rouge: #b3392c;
-    --vert: #2f7d5f;
-    --ombre: 0 1px 3px rgba(11, 46, 79, 0.12);
-    --rayon: 10px;
+    color-scheme: light;
+    --surface:        #fcfcfb;
+    --plane:          #f9f9f7;
+    --ink:            #0b0b0b;
+    --ink-2:          #52514e;
+    --muted:          #898781;
+    --grid:           #e1e0d9;
+    --axis:           #c3c2b7;
+    --hairline:       rgba(11, 11, 11, 0.10);
+
+    --s1: #2a78d6;  --s2: #eb6834;  --s3: #1baf7a;
+    --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+
+    --tier-1: #86b6ef; --tier-2: #5598e7; --tier-3: #2a78d6;
+    --tier-4: #1c5cab; --tier-5: #104281;
+
+    --accent-bg: #eef4fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface: #1a1a19;  --plane: #0d0d0d;
+      --ink: #ffffff;      --ink-2: #c3c2b7;  --muted: #898781;
+      --grid: #2c2c2a;     --axis: #383835;
+      --hairline: rgba(255, 255, 255, 0.10);
+      --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;
+      --tier-1: #184f95; --tier-2: #256abf; --tier-3: #3987e5;
+      --tier-4: #6da7ec; --tier-5: #9ec5f4;
+      --accent-bg: #16233a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #1a1a19;  --plane: #0d0d0d;
+    --ink: #ffffff;      --ink-2: #c3c2b7;  --muted: #898781;
+    --grid: #2c2c2a;     --axis: #383835;
+    --hairline: rgba(255, 255, 255, 0.10);
+    --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;
+    --tier-1: #184f95; --tier-2: #256abf; --tier-3: #3987e5;
+    --tier-4: #6da7ec; --tier-5: #9ec5f4;
+    --accent-bg: #16233a;
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--gris-clair);
-    color: var(--gris-fonce);
+    background: var(--plane);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
   }
 
-  header {
-    background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu));
-    color: var(--blanc);
-    padding: 1.5rem 1.25rem;
-  }
+  .enveloppe { max-width: 1180px; margin: 0 auto; padding: 0 1.1rem; }
 
-  header h1 {
-    margin: 0 0 0.3rem;
-    font-size: 1.4rem;
+  /* ---------- En-tête ---------- */
+  header { background: var(--surface); border-bottom: 1px solid var(--hairline); }
+  .entete-haut {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; padding-top: 1.6rem;
   }
+  h1 { font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: -0.01em; }
+  .sous-titre { color: var(--ink-2); margin: 0; max-width: 62ch; }
 
-  header p {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
+  .bouton-theme {
+    flex: none; background: transparent; color: var(--ink-2); cursor: pointer;
+    border: 1px solid var(--hairline); border-radius: 8px;
+    padding: .45rem .7rem; font: inherit; font-size: .82rem;
   }
+  .bouton-theme:hover { background: var(--plane); }
 
-  .disclaimer {
-    background: #fff3cd;
-    color: #664d03;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.82rem;
-    text-align: center;
+  .avertissement {
+    margin: 1.2rem 0 0; padding: .7rem .9rem;
+    background: var(--accent-bg); border-radius: 8px;
+    font-size: .87rem; color: var(--ink-2);
   }
+  .avertissement strong { color: var(--ink); }
 
-  main {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 1.25rem;
+  nav { display: flex; flex-wrap: wrap; gap: .35rem; padding: 1.1rem 0 1.2rem; }
+  nav a {
+    color: var(--ink-2); text-decoration: none; font-size: .84rem;
+    padding: .32rem .68rem; border-radius: 999px; border: 1px solid var(--hairline);
   }
+  nav a:hover { background: var(--plane); color: var(--ink); }
 
-  .bandeau {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.9rem;
-    margin-bottom: 1.5rem;
+  /* ---------- Sections ---------- */
+  section { padding: 2.2rem 0 .6rem; }
+  h2 {
+    font-size: 1.18rem; margin: 0 0 .3rem;
+    display: flex; align-items: baseline; gap: .55rem;
   }
+  h2 .numero {
+    font-size: .74rem; color: var(--muted); font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .intro { color: var(--ink-2); margin: .1rem 0 1.1rem; max-width: 72ch; }
+  .en-clair {
+    border-left: 3px solid var(--s1); padding: .55rem .9rem;
+    background: var(--surface); border-radius: 0 8px 8px 0;
+    margin: 0 0 1.2rem; max-width: 72ch; font-size: .9rem; color: var(--ink-2);
+  }
+  .en-clair strong { color: var(--ink); }
 
-  .carte-stat {
-    background: var(--blanc);
-    border-radius: var(--rayon);
-    box-shadow: var(--ombre);
-    padding: 1rem 1.1rem;
+  /* ---------- Tuiles ---------- */
+  .tuiles {
+    display: grid; gap: .8rem; margin-bottom: 1.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
   }
+  .tuile {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 10px; padding: .95rem 1rem;
+  }
+  .tuile .valeur { font-size: 1.75rem; font-weight: 650; letter-spacing: -0.02em; }
+  .tuile .libelle { font-size: .8rem; color: var(--ink-2); margin-top: .1rem; }
+  .tuile .note { font-size: .74rem; color: var(--muted); margin-top: .3rem; }
 
-  .carte-stat .valeur {
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--bleu-fonce);
+  /* ---------- Cartes graphiques ---------- */
+  .grille { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(430px, 1fr)); }
+  .pleine { grid-column: 1 / -1; }
+  .carte {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 10px; padding: 1.05rem 1.1rem 1.15rem;
+    /* sans min-width:0, une table à `nowrap` élargit la carte au-delà de la grille */
+    min-width: 0;
   }
+  .carte h3 { font-size: .97rem; margin: 0 0 .15rem; }
+  .carte .aide { font-size: .82rem; color: var(--ink-2); margin: 0 0 .85rem; }
+  .zone-graphique { position: relative; height: 300px; }
+  .zone-graphique.haute { height: 360px; }
 
-  .carte-stat .libelle {
-    font-size: 0.82rem;
-    color: var(--gris);
-    margin-top: 0.2rem;
-  }
+  .legende { display: flex; flex-wrap: wrap; gap: .5rem .95rem; margin: .75rem 0 0; }
+  .legende span { display: inline-flex; align-items: center; gap: .38rem; font-size: .8rem; color: var(--ink-2); }
+  .pastille { width: 11px; height: 11px; border-radius: 3px; flex: none; }
 
-  .grille-graphiques {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 1rem;
+  /* ---------- Tables ---------- */
+  details { margin-top: .85rem; }
+  summary {
+    cursor: pointer; font-size: .82rem; color: var(--ink-2);
+    padding: .25rem 0; list-style-position: inside;
   }
+  summary:hover { color: var(--ink); }
+  .defilement { overflow-x: auto; margin-top: .55rem; max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; font-size: .84rem; }
+  th, td {
+    text-align: left; padding: .42rem .65rem;
+    border-bottom: 1px solid var(--hairline); white-space: nowrap;
+  }
+  th { color: var(--ink-2); font-weight: 600; }
+  td.nombre, th.nombre { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:hover { background: var(--plane); }
 
-  .carte-graphique {
-    background: var(--blanc);
-    border-radius: var(--rayon);
-    box-shadow: var(--ombre);
-    padding: 1.1rem;
+  .etiquette {
+    display: inline-block; padding: .08rem .45rem; border-radius: 5px;
+    font-size: .72rem; font-weight: 600; border: 1px solid transparent;
   }
+  .etiquette.bloquant { color: var(--critical); border-color: var(--critical); }
+  .etiquette.majeur   { color: var(--serious);  border-color: var(--serious); }
+  .etiquette.mineur   { color: var(--ink-2);    border-color: var(--axis); }
 
-  .carte-graphique.pleine-largeur {
-    grid-column: 1 / -1;
+  /* ---------- Étapes ---------- */
+  .etapes { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+  .etape {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 10px; padding: .9rem 1rem;
   }
+  .etape .rang {
+    font-size: .72rem; font-weight: 700; color: var(--s1);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .etape h3 { font-size: .93rem; margin: .2rem 0 .3rem; }
+  .etape p { font-size: .84rem; color: var(--ink-2); margin: 0; }
 
-  .carte-graphique h2 {
-    margin: 0 0 0.8rem;
-    font-size: 1rem;
-    color: var(--bleu-fonce);
-  }
-
-  .conteneur-canvas {
-    position: relative;
-    height: 280px;
-  }
-
-  #message-etat {
-    text-align: center;
-    color: var(--gris);
-    padding: 3rem 1rem;
-  }
+  #etat { padding: 3.5rem 1rem; text-align: center; color: var(--ink-2); }
 
   footer {
-    text-align: center;
-    color: var(--gris);
-    font-size: 0.8rem;
-    padding: 1.5rem 1rem 2.5rem;
+    margin-top: 2.5rem; padding: 1.5rem 0 2.5rem;
+    border-top: 1px solid var(--hairline);
+    font-size: .82rem; color: var(--muted);
   }
+  footer a { color: var(--ink-2); }
 
   @media (max-width: 640px) {
-    .conteneur-canvas { height: 240px; }
+    .grille { grid-template-columns: 1fr; }
+    .zone-graphique, .zone-graphique.haute { height: 260px; }
+    h1 { font-size: 1.25rem; }
   }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>Pipeline de déclaration au Bureau d'Information sur le Crédit (BIC) — UEMOA</h1>
-  <p>Simulation de bout en bout : validation déclarative, résolution d'identité et scoring de solvabilité.</p>
-</header>
-<div class="disclaimer">
-  ⚠️ Données 100&nbsp;% synthétiques. Aucun établissement réel, aucune personne réelle. Voir DISCLAIMER.md.
-</div>
-
-<main>
-  <div id="message-etat">Chargement du tableau de bord…</div>
-
-  <div id="contenu" style="display:none">
-    <section class="bandeau">
-      <div class="carte-stat">
-        <div class="valeur" id="stat-declarations">—</div>
-        <div class="libelle">Déclarations traitées</div>
+  <div class="enveloppe">
+    <div class="entete-haut">
+      <div>
+        <h1>Centrale des risques — tableau de bord</h1>
+        <p class="sous-titre">
+          Ce que devient un fichier de crédits envoyé par une banque : contrôle qualité,
+          regroupement des clients communs à plusieurs banques, puis calcul d'un score de
+          solvabilité.
+        </p>
       </div>
-      <div class="carte-stat">
-        <div class="valeur" id="stat-acceptation">—</div>
-        <div class="libelle">Taux d'acceptation global</div>
-      </div>
-      <div class="carte-stat">
-        <div class="valeur" id="stat-emprunteurs">—</div>
-        <div class="libelle">Emprunteurs consolidés</div>
-      </div>
-      <div class="carte-stat">
-        <div class="valeur" id="stat-auc">—</div>
-        <div class="libelle">AUC du modèle de scoring</div>
-      </div>
-    </section>
-
-    <section class="grille-graphiques">
-      <div class="carte-graphique">
-        <h2>Déclarants classés par taux de rejet</h2>
-        <div class="conteneur-canvas"><canvas id="graphique-declarants"></canvas></div>
-      </div>
-
-      <div class="carte-graphique">
-        <h2>Top 10 des codes d'erreur les plus fréquents</h2>
-        <div class="conteneur-canvas"><canvas id="graphique-erreurs"></canvas></div>
-      </div>
-
-      <div class="carte-graphique pleine-largeur">
-        <h2>Évolution mensuelle du taux de rejet, par profil de déclarant</h2>
-        <div class="conteneur-canvas"><canvas id="graphique-evolution"></canvas></div>
-      </div>
-
-      <div class="carte-graphique">
-        <h2>Complétude déclarative par champ</h2>
-        <div class="conteneur-canvas"><canvas id="graphique-completude"></canvas></div>
-      </div>
-
-      <div class="carte-graphique">
-        <h2>Distribution des scores et taux de défaut observé</h2>
-        <div class="conteneur-canvas"><canvas id="graphique-scores"></canvas></div>
-      </div>
-    </section>
+      <button class="bouton-theme" id="bouton-theme" type="button" aria-label="Changer de thème">
+        Thème
+      </button>
+    </div>
+    <p class="avertissement">
+      <strong>Données entièrement fictives.</strong> Les banques, les clients et les crédits
+      présentés ici sont générés par un programme. Aucun établissement réel, aucune personne
+      réelle.
+    </p>
+    <nav aria-label="Sommaire">
+      <a href="#fonctionnement">Comment ça marche</a>
+      <a href="#volumetrie">Les données</a>
+      <a href="#qualite">Contrôle qualité</a>
+      <a href="#identite">Identités</a>
+      <a href="#score">Score de solvabilité</a>
+    </nav>
   </div>
+</header>
+
+<div id="etat">Chargement du tableau de bord…</div>
+
+<main class="enveloppe" id="contenu" hidden>
+
+  <section aria-label="Indicateurs clés">
+    <div class="tuiles" id="tuiles-bandeau"></div>
+  </section>
+
+  <!-- ============ Comment ça marche ============ -->
+  <section id="fonctionnement">
+    <h2><span class="numero">Repère</span> Comment ça marche</h2>
+    <p class="intro">
+      Une centrale des risques (ou « bureau d'information sur le crédit ») collecte chaque mois,
+      auprès de toutes les banques d'un pays, la liste des crédits en cours. Le but : qu'un
+      prêteur puisse voir la dette totale d'un client, et pas seulement celle qu'il lui a
+      lui-même accordée.
+    </p>
+    <div class="etapes">
+      <div class="etape">
+        <div class="rang">Étape 1</div>
+        <h3>Les banques déclarent</h3>
+        <p>Chaque banque envoie un fichier mensuel listant ses clients et leurs crédits.</p>
+      </div>
+      <div class="etape">
+        <div class="rang">Étape 2</div>
+        <h3>On contrôle</h3>
+        <p>Un moteur vérifie 15 règles : dates valides, montants cohérents, champs obligatoires…</p>
+      </div>
+      <div class="etape">
+        <div class="rang">Étape 3</div>
+        <h3>On regroupe</h3>
+        <p>Un même client déclaré par trois banques, souvent mal orthographié, devient une seule fiche.</p>
+      </div>
+      <div class="etape">
+        <div class="rang">Étape 4</div>
+        <h3>On note</h3>
+        <p>Un modèle statistique attribue un score de solvabilité à chaque client consolidé.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Volumétrie ============ -->
+  <section id="volumetrie">
+    <h2><span class="numero">Section 1</span> Les données traitées</h2>
+    <p class="intro">Volume brassé par une exécution complète du pipeline.</p>
+    <div class="tuiles" id="tuiles-volumetrie"></div>
+  </section>
+
+  <!-- ============ Qualité ============ -->
+  <section id="qualite">
+    <h2><span class="numero">Section 2</span> Contrôle qualité des déclarations</h2>
+    <p class="intro">
+      Chaque ligne reçue est confrontée à un schéma de format puis à 15 règles métier. Selon la
+      gravité du défaut, elle est acceptée, acceptée sous réserve, ou rejetée.
+    </p>
+    <div class="en-clair">
+      <strong>En clair :</strong> une erreur <em>bloquante</em> (montant négatif, date impossible)
+      fait rejeter la ligne — elle n'entre pas en base. Une erreur <em>majeure</em> ou
+      <em>mineure</em> laisse passer la ligne mais la signale au déclarant pour correction.
+    </div>
+
+    <div class="grille">
+      <div class="carte">
+        <h3>Décision par ligne contrôlée</h3>
+        <p class="aide">Ce que devient chaque crédit déclaré après contrôle.</p>
+        <div class="zone-graphique"><canvas id="g-decisions"></canvas></div>
+        <div class="legende" id="l-decisions"></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-decisions"></table></div>
+        </details>
+      </div>
+
+      <div class="carte">
+        <h3>Gravité des anomalies détectées</h3>
+        <p class="aide">Répartition des signalements selon leur niveau de gravité.</p>
+        <div class="zone-graphique"><canvas id="g-severite"></canvas></div>
+        <div class="legende" id="l-severite"></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-severite"></table></div>
+        </details>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Classement des banques par taux de rejet</h3>
+        <p class="aide">
+          Chaque banque est simulée avec un niveau de rigueur connu d'avance. Le contrôle
+          retrouve bien ce classement : c'est la preuve qu'il mesure ce qu'il prétend mesurer.
+        </p>
+        <div class="zone-graphique haute"><canvas id="g-declarants"></canvas></div>
+        <div class="legende" id="l-declarants"></div>
+        <details><summary>Voir le détail par banque</summary>
+          <div class="defilement"><table id="t-declarants"></table></div>
+        </details>
+      </div>
+
+      <div class="carte">
+        <h3>Erreurs les plus fréquentes</h3>
+        <p class="aide">Les 10 codes d'anomalie qui reviennent le plus souvent.</p>
+        <div class="zone-graphique haute"><canvas id="g-erreurs"></canvas></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-erreurs"></table></div>
+        </details>
+      </div>
+
+      <div class="carte">
+        <h3>Champs incomplets</h3>
+        <p class="aide">
+          Nombre de valeurs absentes, champ par champ. Le taux de complétude exact figure
+          dans la table.
+        </p>
+        <div class="zone-graphique haute"><canvas id="g-completude"></canvas></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-completude"></table></div>
+        </details>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Évolution mensuelle du taux de rejet</h3>
+        <p class="aide">Une courbe par niveau de rigueur des banques, sur les 12 arrêtés mensuels.</p>
+        <div class="zone-graphique"><canvas id="g-evolution"></canvas></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-evolution"></table></div>
+        </details>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Fiabilité du moteur de contrôle</h3>
+        <p class="aide">
+          Le générateur sait exactement quelles anomalies il a introduites. On peut donc vérifier,
+          code par code, la part que le moteur a réellement retrouvée.
+        </p>
+        <div class="defilement"><table id="t-detection"></table></div>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Les 15 règles de contrôle</h3>
+        <p class="aide">Le catalogue complet appliqué à chaque fichier reçu.</p>
+        <div class="defilement"><table id="t-regles"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Identité ============ -->
+  <section id="identite">
+    <h2><span class="numero">Section 3</span> Regroupement des identités</h2>
+    <p class="intro">
+      Le même client emprunte souvent auprès de plusieurs banques, qui l'écrivent chacune à leur
+      manière : accents perdus, nom et prénom inversés, prénom réduit à une initiale, date de
+      naissance décalée d'un jour.
+    </p>
+    <div class="en-clair">
+      <strong>Pourquoi c'est critique :</strong> si l'on ne regroupe pas, la dette réelle du client
+      est sous-estimée et le prêteur croit à tort qu'il peut encore lui prêter. Mais fusionner
+      deux personnes <em>différentes</em> est une faute bien plus grave — d'où une exigence de
+      précision très élevée, quitte à manquer quelques doublons.
+    </div>
+    <div class="tuiles" id="tuiles-identite"></div>
+    <div class="grille">
+      <div class="carte pleine">
+        <h3>Clients partagés entre banques</h3>
+        <p class="aide">
+          Nombre de fiches consolidées selon le nombre de banques qui déclarent la même personne.
+        </p>
+        <div class="zone-graphique"><canvas id="g-clusters"></canvas></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-clusters"></table></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Score ============ -->
+  <section id="score">
+    <h2><span class="numero">Section 4</span> Score de solvabilité</h2>
+    <p class="intro">
+      À partir de l'historique des 6 premiers mois, un modèle estime le risque qu'un client se
+      retrouve en défaut (plus de 90 jours de retard) au cours des 6 mois suivants.
+    </p>
+    <div class="en-clair">
+      <strong>En clair :</strong> le score va de 300 à 850 — plus il est élevé, moins le client est
+      risqué. L'<strong>AUC</strong> mesure la capacité du modèle à distinguer un bon d'un mauvais
+      payeur : 0,5 = pile ou face, 1,0 = parfait. Les mesures ci-dessous sont calculées sur des
+      clients que le modèle n'a jamais vus pendant son apprentissage.
+    </div>
+    <div class="tuiles" id="tuiles-score"></div>
+
+    <div class="grille">
+      <div class="carte">
+        <h3>Courbe ROC</h3>
+        <p class="aide">
+          Plus la courbe s'éloigne de la diagonale, meilleur est le modèle. La diagonale
+          représente une décision au hasard.
+        </p>
+        <div class="zone-graphique"><canvas id="g-roc"></canvas></div>
+      </div>
+
+      <div class="carte">
+        <h3>Pouvoir prédictif des variables</h3>
+        <p class="aide">
+          Valeur informative (IV) de chaque variable retenue : plus la barre est longue, plus la
+          variable aide à séparer bons et mauvais payeurs.
+        </p>
+        <div class="zone-graphique"><canvas id="g-iv"></canvas></div>
+        <details><summary>Voir le détail du modèle</summary>
+          <div class="defilement"><table id="t-variables"></table></div>
+        </details>
+      </div>
+
+      <div class="carte">
+        <h3>Répartition des scores</h3>
+        <p class="aide">Nombre de clients par tranche de score sur l'ensemble du portefeuille.</p>
+        <div class="zone-graphique"><canvas id="g-scores"></canvas></div>
+      </div>
+
+      <div class="carte">
+        <h3>Défauts observés par bande de risque</h3>
+        <p class="aide">
+          Contrôle de cohérence : le taux de défaut réel doit augmenter régulièrement de la
+          bande A (meilleurs profils) vers la bande E.
+        </p>
+        <div class="zone-graphique"><canvas id="g-bandes"></canvas></div>
+        <details><summary>Voir les chiffres</summary>
+          <div class="defilement"><table id="t-bandes"></table></div>
+        </details>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Table de gains par décile</h3>
+        <p class="aide">
+          Clients de l'échantillon de test triés par score et découpés en dix groupes égaux. Les
+          déciles les plus bas doivent concentrer les défauts.
+        </p>
+        <div class="defilement"><table id="t-gains"></table></div>
+      </div>
+
+      <div class="carte pleine">
+        <h3>Paramètres du modèle</h3>
+        <p class="aide">Réglages de conversion du risque estimé en points de score.</p>
+        <div class="defilement"><table id="t-parametres"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="pied"></footer>
 </main>
 
-<footer>
-  Généré par <code>scripts/run_pipeline.py</code> à partir de données synthétiques.
-  <a href="https://github.com/blakro/uemoa-credit-bureau-pipeline">Code source</a>
-</footer>
-
 <script>
-  const COULEURS = {
-    bleuFonce: "#0b2e4f",
-    bleu: "#1d5b8a",
-    bleuClair: "#4f8fbf",
-    rouge: "#b3392c",
-    orange: "#c98a2e",
-    vert: "#2f7d5f",
-    gris: "#8a97a3",
-  };
-  const PALETTE_PROFILS = { excellent: COULEURS.vert, moyen: COULEURS.orange, defaillant: COULEURS.rouge };
-  const PALETTE_BANDES = ["#2f7d5f", "#5c9a5f", "#c98a2e", "#c9662e", "#b3392c"];
+(function () {
+  "use strict";
 
-  const formatPourcentage = (v) => `${(v * 100).toFixed(1)} %`;
+  const CHART_OK = typeof Chart !== "undefined";
+  const graphiques = [];
+  let donnees = null;
 
-  async function chargerTableauDeBord() {
-    let donnees;
-    try {
-      const reponse = await fetch("data/dashboard.json");
-      if (!reponse.ok) throw new Error(`HTTP ${reponse.status}`);
-      donnees = await reponse.json();
-    } catch (erreur) {
-      document.getElementById("message-etat").textContent =
-        "Tableau de bord indisponible : docs/data/dashboard.json n'a pas encore été généré. " +
-        "Exécutez scripts/run_pipeline.py pour le produire.";
-      return;
-    }
+  /* ---------------- Utilitaires ---------------- */
+  const nf = new Intl.NumberFormat("fr-FR");
+  const nb = (v) => nf.format(v);
+  const pct = (v, d = 1) => `${(v * 100).toFixed(d).replace(".", ",")} %`;
+  const dec = (v, d = 3) => v.toFixed(d).replace(".", ",");
 
-    document.getElementById("message-etat").style.display = "none";
-    document.getElementById("contenu").style.display = "block";
+  const jeton = (nom) =>
+    getComputedStyle(document.documentElement).getPropertyValue(nom).trim();
 
-    document.getElementById("stat-declarations").textContent = donnees.bandeau.nb_declarations_traitees;
-    document.getElementById("stat-acceptation").textContent = formatPourcentage(donnees.bandeau.taux_acceptation_global);
-    document.getElementById("stat-emprunteurs").textContent = donnees.bandeau.nb_emprunteurs_consolides;
-    document.getElementById("stat-auc").textContent = donnees.bandeau.auc_modele.toFixed(3);
+  const COULEURS_PROFIL = { excellent: "--good", moyen: "--warning", defaillant: "--critical" };
+  const LIBELLE_PROFIL = { excellent: "Rigoureuse", moyen: "Moyenne", defaillant: "Défaillante" };
+  const COULEURS_SEVERITE = { BLOQUANT: "--critical", MAJEUR: "--serious", MINEUR: "--warning" };
 
-    Chart.defaults.font.family = "Segoe UI, Roboto, Helvetica, Arial, sans-serif";
-    Chart.defaults.color = "#5b6b78";
+  function vider(el) { while (el.firstChild) el.removeChild(el.firstChild); }
 
-    // --- Classement des déclarants ---
-    const declarants = donnees.classement_declarants;
-    new Chart(document.getElementById("graphique-declarants"), {
-      type: "bar",
-      data: {
-        labels: declarants.map((d) => d.raison_sociale),
-        datasets: [
-          {
-            label: "Taux de rejet",
-            data: declarants.map((d) => d.taux_rejet),
-            backgroundColor: COULEURS.bleu,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { callback: formatPourcentage }, beginAtZero: true },
-        },
-      },
+  /** Construit une table HTML depuis des en-têtes et des lignes de cellules. */
+  function table(el, entetes, lignes) {
+    vider(el);
+    const thead = document.createElement("thead");
+    const trh = document.createElement("tr");
+    entetes.forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = typeof h === "string" ? h : h.texte;
+      if (typeof h !== "string" && h.nombre) th.className = "nombre";
+      trh.appendChild(th);
     });
+    thead.appendChild(trh);
+    el.appendChild(thead);
 
-    // --- Top erreurs ---
-    const erreurs = donnees.top_erreurs;
-    new Chart(document.getElementById("graphique-erreurs"), {
-      type: "bar",
-      data: {
-        labels: erreurs.map((e) => e.code),
-        datasets: [
-          {
-            label: "Occurrences",
-            data: erreurs.map((e) => e.occurrences),
-            backgroundColor: COULEURS.bleuClair,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } },
-      },
+    const tbody = document.createElement("tbody");
+    lignes.forEach((ligne) => {
+      const tr = document.createElement("tr");
+      ligne.forEach((cellule, i) => {
+        const td = document.createElement("td");
+        if (cellule && cellule.html) td.innerHTML = cellule.html;
+        else td.textContent = cellule === null || cellule === undefined ? "" : String(cellule);
+        const h = entetes[i];
+        if (typeof h !== "string" && h.nombre) td.className = "nombre";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
     });
+    el.appendChild(tbody);
+  }
 
-    // --- Évolution mensuelle ---
-    const evolution = donnees.evolution_mensuelle;
-    new Chart(document.getElementById("graphique-evolution"), {
-      type: "line",
-      data: {
-        labels: evolution.arretes,
-        datasets: evolution.series.map((s) => ({
-          label: s.profil,
-          data: s.taux_rejet,
-          borderColor: PALETTE_PROFILS[s.profil] || COULEURS.gris,
-          backgroundColor: PALETTE_PROFILS[s.profil] || COULEURS.gris,
-          tension: 0.25,
-          fill: false,
-        })),
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { y: { ticks: { callback: formatPourcentage }, beginAtZero: true } },
-      },
-    });
-
-    // --- Complétude par champ ---
-    const completude = donnees.completude_par_champ;
-    new Chart(document.getElementById("graphique-completude"), {
-      type: "bar",
-      data: {
-        labels: completude.map((c) => c.champ),
-        datasets: [
-          {
-            label: "Taux de complétude",
-            data: completude.map((c) => c.taux_completude),
-            backgroundColor: COULEURS.vert,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { min: 0, max: 1, ticks: { callback: formatPourcentage } } },
-      },
-    });
-
-    // --- Distribution des scores ---
-    const distribution = donnees.distribution_scores;
-    new Chart(document.getElementById("graphique-scores"), {
-      data: {
-        labels: distribution.bandes.map((b) => `Bande ${b}`),
-        datasets: [
-          {
-            type: "bar",
-            label: "Nombre d'emprunteurs",
-            data: distribution.nb_emprunteurs,
-            backgroundColor: PALETTE_BANDES,
-            order: 2,
-            yAxisID: "y",
-          },
-          {
-            type: "line",
-            label: "Taux de défaut observé",
-            data: distribution.taux_defaut_observe,
-            borderColor: COULEURS.bleuFonce,
-            backgroundColor: COULEURS.bleuFonce,
-            yAxisID: "y1",
-            order: 1,
-            tension: 0.25,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { position: "left", beginAtZero: true, title: { display: true, text: "Emprunteurs" } },
-          y1: {
-            position: "right",
-            beginAtZero: true,
-            grid: { drawOnChartArea: false },
-            ticks: { callback: formatPourcentage },
-            title: { display: true, text: "Taux de défaut" },
-          },
-        },
-      },
+  function tuiles(el, items) {
+    vider(el);
+    items.forEach((item) => {
+      const div = document.createElement("div");
+      div.className = "tuile";
+      const v = document.createElement("div");
+      v.className = "valeur";
+      v.textContent = item.valeur;
+      const l = document.createElement("div");
+      l.className = "libelle";
+      l.textContent = item.libelle;
+      div.append(v, l);
+      if (item.note) {
+        const n = document.createElement("div");
+        n.className = "note";
+        n.textContent = item.note;
+        div.appendChild(n);
+      }
+      el.appendChild(div);
     });
   }
 
-  chargerTableauDeBord();
+  function legende(el, entrees) {
+    vider(el);
+    entrees.forEach(([couleur, texte]) => {
+      const s = document.createElement("span");
+      const p = document.createElement("i");
+      p.className = "pastille";
+      p.style.background = couleur;
+      s.append(p, document.createTextNode(texte));
+      el.appendChild(s);
+    });
+  }
+
+  function etiquetteSeverite(severite) {
+    return { html: `<span class="etiquette ${severite.toLowerCase()}">${severite}</span>` };
+  }
+
+  /* ---------------- Socle des graphiques ---------------- */
+  function creer(id, config) {
+    if (!CHART_OK) return;
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ink2 = jeton("--ink-2");
+    const grid = jeton("--grid");
+
+    const base = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "nearest", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: jeton("--ink"),
+          titleColor: jeton("--surface"),
+          bodyColor: jeton("--surface"),
+          padding: 10,
+          cornerRadius: 6,
+          displayColors: false,
+        },
+      },
+      scales: {},
+    };
+    const options = fusion(base, config.options || {});
+    ["x", "y"].forEach((axe) => {
+      if (!options.scales[axe]) return;
+      options.scales[axe].ticks = Object.assign({ color: ink2 }, options.scales[axe].ticks || {});
+      options.scales[axe].grid = Object.assign(
+        { color: grid, drawTicks: false }, options.scales[axe].grid || {}
+      );
+      options.scales[axe].border = Object.assign(
+        { color: jeton("--axis") }, options.scales[axe].border || {}
+      );
+    });
+
+    graphiques.push(new Chart(canvas, { type: config.type, data: config.data, options }));
+  }
+
+  function fusion(a, b) {
+    const out = Array.isArray(a) ? a.slice() : Object.assign({}, a);
+    Object.keys(b).forEach((k) => {
+      const v = b[k];
+      out[k] = v && typeof v === "object" && !Array.isArray(v) ? fusion(a[k] || {}, v) : v;
+    });
+    return out;
+  }
+
+  const axePourcent = (max) => ({
+    beginAtZero: true,
+    max: max,
+    ticks: { callback: (v) => `${Math.round(v * 100)} %` },
+  });
+
+  /* ---------------- Rendu ---------------- */
+  function rendre() {
+    graphiques.splice(0).forEach((g) => g.destroy());
+    const d = donnees;
+
+    /* --- Bandeau --- */
+    tuiles(document.getElementById("tuiles-bandeau"), [
+      { valeur: nb(d.bandeau.nb_declarations_traitees), libelle: "Fichiers contrôlés" },
+      { valeur: pct(d.bandeau.taux_acceptation_global), libelle: "Lignes acceptées" },
+      { valeur: nb(d.bandeau.nb_emprunteurs_consolides), libelle: "Clients consolidés" },
+      {
+        valeur: pct(d.bandeau.rappel_validation, 2),
+        libelle: "Anomalies détectées",
+        note: "Part des défauts réels retrouvés",
+      },
+      {
+        valeur: pct(d.bandeau.precision_identite, 1),
+        libelle: "Précision du regroupement",
+        note: "Fusions correctes",
+      },
+      { valeur: dec(d.bandeau.auc_modele), libelle: "AUC du modèle", note: "0,5 = hasard" },
+    ]);
+
+    /* --- Volumétrie --- */
+    const v = d.volumetrie;
+    tuiles(document.getElementById("tuiles-volumetrie"), [
+      { valeur: nb(v.nb_declarants), libelle: "Banques déclarantes" },
+      { valeur: nb(v.nb_emprunteurs_declares), libelle: "Fiches clients reçues" },
+      { valeur: nb(v.nb_contrats), libelle: "Crédits" },
+      { valeur: nb(v.nb_situations), libelle: "Relevés mensuels" },
+      { valeur: nb(v.nb_fichiers_declaration), libelle: "Fichiers XML produits" },
+      {
+        valeur: nb(v.nb_anomalies_injectees),
+        libelle: "Anomalies introduites",
+        note: "Volontairement, pour tester le contrôle",
+      },
+    ]);
+
+    /* --- Décisions --- */
+    const dec3 = d.decisions;
+    const couleursDecision = [jeton("--good"), jeton("--warning"), jeton("--critical")];
+    creer("g-decisions", {
+      type: "doughnut",
+      data: {
+        labels: dec3.map((x) => x.decision),
+        datasets: [{
+          data: dec3.map((x) => x.nb),
+          backgroundColor: couleursDecision,
+          borderColor: jeton("--surface"),
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        cutout: "58%",
+        plugins: {
+          tooltip: { callbacks: { label: (c) => `${c.label} : ${nb(c.parsed)}` } },
+        },
+      },
+    });
+    legende(
+      document.getElementById("l-decisions"),
+      dec3.map((x, i) => [couleursDecision[i], x.decision])
+    );
+    const totalDec = dec3.reduce((s, x) => s + x.nb, 0);
+    table(
+      document.getElementById("t-decisions"),
+      ["Décision", { texte: "Lignes", nombre: true }, { texte: "Part", nombre: true }],
+      dec3.map((x) => [x.decision, nb(x.nb), pct(x.nb / totalDec)])
+    );
+
+    /* --- Sévérité --- */
+    const sev = d.qualite.repartition_severite;
+    const couleursSev = sev.map((s) => jeton(COULEURS_SEVERITE[s.severite]));
+    creer("g-severite", {
+      type: "bar",
+      data: {
+        labels: sev.map((s) => s.severite),
+        datasets: [{
+          data: sev.map((s) => s.occurrences),
+          backgroundColor: couleursSev,
+          borderRadius: 4,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        scales: { y: { beginAtZero: true, ticks: { callback: (x) => nb(x) } }, x: { grid: { display: false } } },
+        plugins: { tooltip: { callbacks: { label: (c) => `${nb(c.parsed.y)} signalements` } } },
+      },
+    });
+    legende(
+      document.getElementById("l-severite"),
+      sev.map((s, i) => [couleursSev[i], s.severite])
+    );
+    table(
+      document.getElementById("t-severite"),
+      ["Gravité", { texte: "Occurrences", nombre: true }, { texte: "Part", nombre: true }],
+      sev.map((s) => [etiquetteSeverite(s.severite), nb(s.occurrences), pct(s.part)])
+    );
+
+    /* --- Déclarants --- */
+    const decl = d.qualite.classement_declarants;
+    creer("g-declarants", {
+      type: "bar",
+      data: {
+        labels: decl.map((x) => x.raison_sociale),
+        datasets: [{
+          data: decl.map((x) => x.taux_rejet),
+          backgroundColor: decl.map((x) => jeton(COULEURS_PROFIL[x.profil_qualite] || "--s1")),
+          borderRadius: 4,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        scales: { x: axePourcent(undefined), y: { grid: { display: false } } },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (c) => {
+                const b = decl[c.dataIndex];
+                return `${pct(b.taux_rejet)} rejeté — ${nb(b.nb_rejetes)} / ${nb(b.nb_contrats)} lignes`;
+              },
+            },
+          },
+        },
+      },
+    });
+    legende(
+      document.getElementById("l-declarants"),
+      Object.keys(COULEURS_PROFIL).map((p) => [jeton(COULEURS_PROFIL[p]), `Rigueur ${LIBELLE_PROFIL[p].toLowerCase()}`])
+    );
+    table(
+      document.getElementById("t-declarants"),
+      [
+        "Banque", "Type", "Rigueur simulée",
+        { texte: "Lignes", nombre: true },
+        { texte: "Rejetées", nombre: true },
+        { texte: "Taux de rejet", nombre: true },
+      ],
+      decl.map((x) => [
+        x.raison_sociale,
+        x.type_etablissement.replace(/_/g, " "),
+        LIBELLE_PROFIL[x.profil_qualite] || x.profil_qualite,
+        nb(x.nb_contrats), nb(x.nb_rejetes), pct(x.taux_rejet),
+      ])
+    );
+
+    /* --- Erreurs --- */
+    const err = d.qualite.top_erreurs;
+    const abrege = (t, n) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
+    creer("g-erreurs", {
+      type: "bar",
+      data: {
+        labels: err.map((e) => `${e.code} · ${abrege(e.libelle_fr, 30)}`),
+        datasets: [{
+          data: err.map((e) => e.occurrences),
+          backgroundColor: jeton("--s1"),
+          borderRadius: 4,
+          borderSkipped: false,
+          maxBarThickness: 18,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        scales: { x: { beginAtZero: true, ticks: { callback: (x) => nb(x) } }, y: { grid: { display: false } } },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              title: (items) => err[items[0].dataIndex].libelle_fr,
+              label: (c) => `${nb(c.parsed.x)} occurrences`,
+            },
+          },
+        },
+      },
+    });
+    table(
+      document.getElementById("t-erreurs"),
+      ["Code", "Anomalie", "Gravité", { texte: "Occurrences", nombre: true }],
+      err.map((e) => [e.code, e.libelle_fr, etiquetteSeverite(e.severite), nb(e.occurrences)])
+    );
+
+    /* --- Complétude : on trace les valeurs absentes, bien plus lisible que des
+       barres toutes proches de 100 % ; le taux exact reste dans la table. --- */
+    const comp = d.qualite.completude_par_champ;
+    creer("g-completude", {
+      type: "bar",
+      data: {
+        labels: comp.map((c) => c.libelle),
+        datasets: [{
+          data: comp.map((c) => c.nb_manquants),
+          backgroundColor: jeton("--s1"),
+          borderRadius: 4,
+          borderSkipped: false,
+          maxBarThickness: 18,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        scales: {
+          x: { beginAtZero: true, ticks: { callback: (x) => nb(x) } },
+          y: { grid: { display: false } },
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (c) =>
+                `${nb(c.parsed.x)} valeurs absentes — ${pct(comp[c.dataIndex].taux_completude, 2)} rempli`,
+            },
+          },
+        },
+      },
+    });
+    table(
+      document.getElementById("t-completude"),
+      ["Champ", { texte: "Complétude", nombre: true }, { texte: "Valeurs manquantes", nombre: true }],
+      comp.map((c) => [c.libelle, pct(c.taux_completude, 2), nb(c.nb_manquants)])
+    );
+
+    /* --- Évolution --- */
+    const evo = d.qualite.evolution_mensuelle;
+    creer("g-evolution", {
+      type: "line",
+      data: {
+        labels: evo.arretes,
+        datasets: evo.series.map((s) => ({
+          label: `Rigueur ${LIBELLE_PROFIL[s.profil].toLowerCase()}`,
+          data: s.taux_rejet,
+          borderColor: jeton(COULEURS_PROFIL[s.profil]),
+          backgroundColor: jeton(COULEURS_PROFIL[s.profil]),
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          tension: 0.25,
+        })),
+      },
+      options: {
+        scales: { y: axePourcent(undefined), x: { grid: { display: false } } },
+        plugins: {
+          legend: { display: true, position: "bottom", labels: { color: jeton("--ink-2"), usePointStyle: true, boxWidth: 8 } },
+          tooltip: { displayColors: true, callbacks: { label: (c) => `${c.dataset.label} : ${pct(c.parsed.y)}` } },
+        },
+      },
+    });
+    table(
+      document.getElementById("t-evolution"),
+      ["Arrêté", ...evo.series.map((s) => ({ texte: `Rigueur ${LIBELLE_PROFIL[s.profil].toLowerCase()}`, nombre: true }))],
+      evo.arretes.map((a, i) => [a, ...evo.series.map((s) => pct(s.taux_rejet[i]))])
+    );
+
+    /* --- Détection --- */
+    const det = d.qualite.detection;
+    table(
+      document.getElementById("t-detection"),
+      [
+        "Code",
+        { texte: "Injectées", nombre: true },
+        { texte: "Détectées", nombre: true },
+        { texte: "Taux de détection", nombre: true },
+      ],
+      det.par_code
+        .map((c) => [c.code, nb(c.injectees), nb(c.detectees), pct(c.rappel, 1)])
+        .concat([[
+          { html: "<strong>Total</strong>" },
+          { html: `<strong>${nb(det.total_anomalies)}</strong>` },
+          { html: `<strong>${nb(det.total_detectees)}</strong>` },
+          { html: `<strong>${pct(det.rappel_global, 2)}</strong>` },
+        ]])
+    );
+
+    /* --- Règles --- */
+    table(
+      document.getElementById("t-regles"),
+      ["Code", "Règle", "Gravité", "Portée"],
+      d.qualite.catalogue_regles.map((r) => [
+        r.code, r.libelle_fr, etiquetteSeverite(r.severite), r.entites.replace(/_/g, " "),
+      ])
+    );
+
+    /* --- Identité --- */
+    const id = d.identite;
+    const partagees = id.distribution_tailles
+      .filter((x) => x.nb_declarants > 1)
+      .reduce((s, x) => s + x.nb_identites, 0);
+    tuiles(document.getElementById("tuiles-identite"), [
+      { valeur: nb(id.nb_enregistrements), libelle: "Fiches reçues" },
+      { valeur: nb(id.nb_identites_predites), libelle: "Clients distincts après regroupement" },
+      { valeur: nb(partagees), libelle: "Clients connus de plusieurs banques" },
+      { valeur: pct(id.precision, 1), libelle: "Précision", note: `${nb(id.faux_positifs)} fusion(s) erronée(s)` },
+      { valeur: pct(id.rappel, 1), libelle: "Rappel", note: `${nb(id.faux_negatifs)} doublon(s) manqué(s)` },
+      { valeur: dec(id.f1), libelle: "Score F1" },
+    ]);
+
+    const cl = id.distribution_tailles;
+    creer("g-clusters", {
+      type: "bar",
+      data: {
+        labels: cl.map((x) => (x.nb_declarants === 1 ? "1 banque" : `${x.nb_declarants} banques`)),
+        datasets: [{
+          data: cl.map((x) => x.nb_identites),
+          backgroundColor: jeton("--s1"),
+          borderRadius: 4,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        scales: { y: { beginAtZero: true, ticks: { callback: (x) => nb(x) } }, x: { grid: { display: false } } },
+        plugins: { tooltip: { callbacks: { label: (c) => `${nb(c.parsed.y)} clients` } } },
+      },
+    });
+    table(
+      document.getElementById("t-clusters"),
+      ["Déclaré par", { texte: "Clients", nombre: true }],
+      cl.map((x) => [x.nb_declarants === 1 ? "1 banque" : `${x.nb_declarants} banques`, nb(x.nb_identites)])
+    );
+
+    /* --- Score --- */
+    const sc = d.scoring;
+    tuiles(document.getElementById("tuiles-score"), [
+      { valeur: dec(sc.auc), libelle: "AUC", note: "Pouvoir discriminant" },
+      { valeur: dec(sc.gini), libelle: "Gini" },
+      { valeur: dec(sc.ks), libelle: "KS" },
+      { valeur: nb(sc.nb_emprunteurs_notes), libelle: "Clients notés" },
+      { valeur: pct(sc.taux_defaut_global), libelle: "Taux de défaut observé" },
+      { valeur: nb(sc.variables.length), libelle: "Variables retenues" },
+    ]);
+
+    creer("g-roc", {
+      type: "line",
+      data: {
+        labels: sc.courbe_roc.map((p) => p.fpr),
+        datasets: [
+          {
+            label: "Modèle",
+            data: sc.courbe_roc.map((p) => ({ x: p.fpr, y: p.tpr })),
+            borderColor: jeton("--s1"),
+            backgroundColor: jeton("--s1"),
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            tension: 0.1,
+          },
+          {
+            label: "Hasard",
+            data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+            borderColor: jeton("--muted"),
+            borderWidth: 1.5,
+            borderDash: [5, 4],
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        parsing: false,
+        scales: {
+          x: { type: "linear", min: 0, max: 1, title: { display: true, text: "Faux positifs", color: jeton("--ink-2") }, ticks: { callback: (v) => `${Math.round(v * 100)} %` } },
+          y: { type: "linear", min: 0, max: 1, title: { display: true, text: "Vrais positifs", color: jeton("--ink-2") }, ticks: { callback: (v) => `${Math.round(v * 100)} %` } },
+        },
+        plugins: {
+          legend: { display: true, position: "bottom", labels: { color: jeton("--ink-2"), usePointStyle: true, boxWidth: 8 } },
+          tooltip: { displayColors: true, callbacks: { label: (c) => `${pct(c.parsed.x)} / ${pct(c.parsed.y)}` } },
+        },
+      },
+    });
+
+    creer("g-iv", {
+      type: "bar",
+      data: {
+        labels: sc.variables.map((x) => x.libelle),
+        datasets: [{
+          data: sc.variables.map((x) => x.iv),
+          backgroundColor: jeton("--s1"),
+          borderRadius: 4,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        scales: { x: { beginAtZero: true, ticks: { callback: (v) => dec(v, 2) } }, y: { grid: { display: false } } },
+        plugins: { tooltip: { callbacks: { label: (c) => `IV = ${dec(c.parsed.x, 3)}` } } },
+      },
+    });
+    table(
+      document.getElementById("t-variables"),
+      [
+        "Variable",
+        { texte: "IV", nombre: true },
+        { texte: "Coefficient", nombre: true },
+        { texte: "Classes", nombre: true },
+      ],
+      sc.variables.map((x) => [x.libelle, dec(x.iv, 3), dec(x.coefficient, 3), nb(x.nb_classes)])
+    );
+
+    const hist = sc.histogramme_scores;
+    creer("g-scores", {
+      type: "bar",
+      data: {
+        labels: hist.map((h) => Math.round(h.borne_sup)),
+        datasets: [{
+          data: hist.map((h) => h.nb_emprunteurs),
+          backgroundColor: jeton("--s1"),
+          borderRadius: 2,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        scales: {
+          x: { grid: { display: false }, title: { display: true, text: "Score", color: jeton("--ink-2") } },
+          y: { beginAtZero: true, ticks: { callback: (x) => nb(x) } },
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              title: (items) => `Score ${Math.round(hist[items[0].dataIndex].borne_inf)} à ${Math.round(hist[items[0].dataIndex].borne_sup)}`,
+              label: (c) => `${nb(c.parsed.y)} clients`,
+            },
+          },
+        },
+      },
+    });
+
+    const bandes = sc.bandes_risque;
+    const rampe = ["--tier-1", "--tier-2", "--tier-3", "--tier-4", "--tier-5"];
+    creer("g-bandes", {
+      type: "bar",
+      data: {
+        labels: bandes.map((b) => `Bande ${b.bande}`),
+        datasets: [{
+          data: bandes.map((b) => b.taux_defaut_observe),
+          backgroundColor: bandes.map((_, i) => jeton(rampe[i])),
+          borderRadius: 4,
+          borderSkipped: false,
+        maxBarThickness: 34,
+        }],
+      },
+      options: {
+        scales: { y: axePourcent(undefined), x: { grid: { display: false } } },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (c) => `${pct(c.parsed.y)} de défaut — ${nb(bandes[c.dataIndex].nb_emprunteurs)} clients`,
+            },
+          },
+        },
+      },
+    });
+    table(
+      document.getElementById("t-bandes"),
+      [
+        "Bande",
+        { texte: "Score plancher", nombre: true },
+        { texte: "Clients", nombre: true },
+        { texte: "Taux de défaut", nombre: true },
+      ],
+      bandes.map((b) => [
+        `Bande ${b.bande}`, nb(b.score_plancher), nb(b.nb_emprunteurs), pct(b.taux_defaut_observe),
+      ])
+    );
+
+    table(
+      document.getElementById("t-gains"),
+      [
+        { texte: "Décile", nombre: true },
+        { texte: "Clients", nombre: true },
+        { texte: "Défauts", nombre: true },
+        { texte: "Taux de défaut", nombre: true },
+      ],
+      sc.table_gains.map((g) => [
+        nb(g.decile), nb(g.nb_emprunteurs), nb(g.nb_defauts), pct(g.taux_defaut),
+      ])
+    );
+
+    const p = sc.parametres;
+    table(
+      document.getElementById("t-parametres"),
+      ["Paramètre", { texte: "Valeur", nombre: true }],
+      [
+        ["Points pour doubler les chances (PDO)", nb(p.pdo)],
+        ["Score de référence", nb(p.score_reference)],
+        ["Chances de référence", `${nb(p.odds_reference)} : 1`],
+        ["Score minimum", nb(p.score_min)],
+        ["Score maximum", nb(p.score_max)],
+      ]
+    );
+
+    /* --- Pied de page --- */
+    const pied = document.getElementById("pied");
+    const date = new Date(d.meta.genere_le);
+    pied.textContent =
+      `Généré le ${date.toLocaleDateString("fr-FR")} par scripts/run_pipeline.py ` +
+      `(graine ${d.meta.seed}) — ${d.meta.nb_arretes} arrêtés mensuels, ` +
+      `du ${d.meta.periode_debut} au ${d.meta.periode_fin}. Données synthétiques. `;
+    const lien = document.createElement("a");
+    lien.href = "https://github.com/blakro/uemoa-credit-bureau-pipeline";
+    lien.textContent = "Code source";
+    pied.appendChild(lien);
+  }
+
+  /* ---------------- Thème ---------------- */
+  document.getElementById("bouton-theme").addEventListener("click", () => {
+    const sombreActuel =
+      document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.hasAttribute("data-theme") &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", sombreActuel ? "light" : "dark");
+    if (donnees) rendre();
+  });
+
+  /* ---------------- Chargement ---------------- */
+  fetch("data/dashboard.json")
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((json) => {
+      donnees = json;
+      document.getElementById("etat").hidden = true;
+      document.getElementById("contenu").hidden = false;
+      if (!CHART_OK) {
+        document.querySelectorAll(".zone-graphique").forEach((z) => (z.hidden = true));
+        document.querySelectorAll("details").forEach((d) => (d.open = true));
+      }
+      rendre();
+    })
+    .catch(() => {
+      document.getElementById("etat").textContent =
+        "Tableau de bord indisponible : docs/data/dashboard.json n'a pas encore été généré. " +
+        "Exécutez scripts/run_pipeline.py pour le produire.";
+    });
+})();
 </script>
 </body>
 </html>

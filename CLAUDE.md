@@ -1,9 +1,9 @@
 # Contexte projet
 
 Simulation du pipeline de déclaration à un Bureau d'Information sur le
-Crédit (BIC) de la zone UEMOA. Projet portfolio pour une candidature
-d'analyste de données. Toutes les données sont SYNTHÉTIQUES et générées
-par le code : aucune donnée réelle, aucun établissement réel.
+Crédit (BIC) de la zone UEMOA. Projet de démonstration technique.
+Toutes les données sont SYNTHÉTIQUES et générées par le code : aucune
+donnée réelle, aucun établissement réel.
 
 ## Contraintes d'environnement — IMPÉRATIF
 - L'utilisateur n'a AUCUN environnement local. Ne propose jamais

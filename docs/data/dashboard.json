@@ -1,238 +1,1065 @@
 {
+  "meta": {
+    "genere_le": "2026-08-20T14:34:06+00:00",
+    "seed": 42,
+    "nb_arretes": 12,
+    "periode_debut": "2025-08-31",
+    "periode_fin": "2026-07-31"
+  },
+  "volumetrie": {
+    "nb_declarants": 12,
+    "nb_emprunteurs_declares": 3000,
+    "nb_contrats": 5000,
+    "nb_situations": 30490,
+    "nb_fichiers_declaration": 144,
+    "nb_anomalies_injectees": 5512
+  },
   "bandeau": {
     "nb_declarations_traitees": 144,
     "taux_acceptation_global": 0.8342079370285339,
     "nb_emprunteurs_consolides": 2331,
-    "auc_modele": 0.6642058996502306
+    "auc_modele": 0.6642058996502306,
+    "rappel_validation": 0.9995907509719665,
+    "precision_identite": 1.0,
+    "gini": 0.32841179930046116,
+    "ks": 0.29813972204166284
   },
-  "classement_declarants": [
+  "decisions": [
     {
-      "code_declarant": "SF000002",
-      "raison_sociale": "SFD Solidarité Rurale",
-      "taux_rejet": 0.49297658862876254
+      "decision": "Accepté",
+      "nb": 24427
     },
     {
-      "code_declarant": "EF000004",
-      "raison_sociale": "EF Kappa Services",
-      "taux_rejet": 0.3641434262948207
+      "decision": "Accepté avec réserve",
+      "nb": 1008
     },
     {
-      "code_declarant": "BQ000005",
-      "raison_sociale": "Banque Étoile du Fleuve",
-      "taux_rejet": 0.3296969696969697
-    },
-    {
-      "code_declarant": "BQ000004",
-      "raison_sociale": "Banque Horizon Sahélien",
-      "taux_rejet": 0.27862171174509076
-    },
-    {
-      "code_declarant": "BQ000006",
-      "raison_sociale": "Banque Oméga du Ténéré",
-      "taux_rejet": 0.16223832528180354
-    },
-    {
-      "code_declarant": "SF000001",
-      "raison_sociale": "SFD Espoir Niamey",
-      "taux_rejet": 0.11166666666666666
-    },
-    {
-      "code_declarant": "EF000003",
-      "raison_sociale": "EF Delta Investissement",
-      "taux_rejet": 0.058530510585305104
-    },
-    {
-      "code_declarant": "BQ000003",
-      "raison_sociale": "Banque Concorde UEMOA",
-      "taux_rejet": 0.05094263939029282
-    },
-    {
-      "code_declarant": "EF000002",
-      "raison_sociale": "EF Gamma Crédit",
-      "taux_rejet": 0.04534883720930233
-    },
-    {
-      "code_declarant": "BQ000001",
-      "raison_sociale": "Banque Alpha du Sahel",
-      "taux_rejet": 0.0063264445381695485
-    },
-    {
-      "code_declarant": "EF000001",
-      "raison_sociale": "EF Béta Finances",
-      "taux_rejet": 0.005606728073688426
-    },
-    {
-      "code_declarant": "BQ000002",
-      "raison_sociale": "Banque Zénith du Niger",
-      "taux_rejet": 0.005422153369481022
+      "decision": "Rejeté",
+      "nb": 5055
     }
   ],
-  "top_erreurs": [
-    {
-      "code": "E002",
-      "occurrences": 831
-    },
-    {
-      "code": "E004",
-      "occurrences": 440
-    },
-    {
-      "code": "E011",
-      "occurrences": 435
-    },
-    {
-      "code": "E008",
-      "occurrences": 428
-    },
-    {
-      "code": "E005",
-      "occurrences": 428
-    },
-    {
-      "code": "E006",
-      "occurrences": 424
-    },
-    {
-      "code": "E010",
-      "occurrences": 423
-    },
-    {
-      "code": "E001",
-      "occurrences": 418
-    },
-    {
-      "code": "E003",
-      "occurrences": 410
-    },
-    {
-      "code": "E014",
-      "occurrences": 396
-    }
-  ],
-  "evolution_mensuelle": {
-    "arretes": [
-      "2025-08-31",
-      "2025-09-30",
-      "2025-10-31",
-      "2025-11-30",
-      "2025-12-31",
-      "2026-01-31",
-      "2026-02-28",
-      "2026-03-31",
-      "2026-04-30",
-      "2026-05-31",
-      "2026-06-30",
-      "2026-07-31"
+  "qualite": {
+    "classement_declarants": [
+      {
+        "code_declarant": "SF000002",
+        "raison_sociale": "SFD Solidarité Rurale",
+        "type_etablissement": "sfd",
+        "profil_qualite": "defaillant",
+        "taux_rejet": 0.49297658862876254,
+        "taux_reserve": 0.06153846153846154,
+        "nb_contrats": 2990,
+        "nb_rejetes": 1474
+      },
+      {
+        "code_declarant": "EF000004",
+        "raison_sociale": "EF Kappa Services",
+        "type_etablissement": "etablissement_financier",
+        "profil_qualite": "defaillant",
+        "taux_rejet": 0.3641434262948207,
+        "taux_reserve": 0.07410358565737052,
+        "nb_contrats": 2510,
+        "nb_rejetes": 914
+      },
+      {
+        "code_declarant": "BQ000005",
+        "raison_sociale": "Banque Étoile du Fleuve",
+        "type_etablissement": "banque",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.3296969696969697,
+        "taux_reserve": 0.024646464646464646,
+        "nb_contrats": 2475,
+        "nb_rejetes": 816
+      },
+      {
+        "code_declarant": "BQ000004",
+        "raison_sociale": "Banque Horizon Sahélien",
+        "type_etablissement": "banque",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.27862171174509076,
+        "taux_reserve": 0.018525379770285292,
+        "nb_contrats": 2699,
+        "nb_rejetes": 752
+      },
+      {
+        "code_declarant": "BQ000006",
+        "raison_sociale": "Banque Oméga du Ténéré",
+        "type_etablissement": "banque",
+        "profil_qualite": "defaillant",
+        "taux_rejet": 0.16223832528180354,
+        "taux_reserve": 0.09782608695652174,
+        "nb_contrats": 2484,
+        "nb_rejetes": 403
+      },
+      {
+        "code_declarant": "SF000001",
+        "raison_sociale": "SFD Espoir Niamey",
+        "type_etablissement": "sfd",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.11166666666666666,
+        "taux_reserve": 0.029583333333333333,
+        "nb_contrats": 2400,
+        "nb_rejetes": 268
+      },
+      {
+        "code_declarant": "EF000003",
+        "raison_sociale": "EF Delta Investissement",
+        "type_etablissement": "etablissement_financier",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.058530510585305104,
+        "taux_reserve": 0.019510170195101702,
+        "nb_contrats": 2409,
+        "nb_rejetes": 141
+      },
+      {
+        "code_declarant": "BQ000003",
+        "raison_sociale": "Banque Concorde UEMOA",
+        "type_etablissement": "banque",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.05094263939029282,
+        "taux_reserve": 0.02286401925391095,
+        "nb_contrats": 2493,
+        "nb_rejetes": 127
+      },
+      {
+        "code_declarant": "EF000002",
+        "raison_sociale": "EF Gamma Crédit",
+        "type_etablissement": "etablissement_financier",
+        "profil_qualite": "moyen",
+        "taux_rejet": 0.04534883720930233,
+        "taux_reserve": 0.03255813953488372,
+        "nb_contrats": 2580,
+        "nb_rejetes": 117
+      },
+      {
+        "code_declarant": "BQ000001",
+        "raison_sociale": "Banque Alpha du Sahel",
+        "type_etablissement": "banque",
+        "profil_qualite": "excellent",
+        "taux_rejet": 0.0063264445381695485,
+        "taux_reserve": 0.0029523407844791226,
+        "nb_contrats": 2371,
+        "nb_rejetes": 15
+      },
+      {
+        "code_declarant": "EF000001",
+        "raison_sociale": "EF Béta Finances",
+        "type_etablissement": "etablissement_financier",
+        "profil_qualite": "excellent",
+        "taux_rejet": 0.005606728073688426,
+        "taux_reserve": 0.004004805766920304,
+        "nb_contrats": 2497,
+        "nb_rejetes": 14
+      },
+      {
+        "code_declarant": "BQ000002",
+        "raison_sociale": "Banque Zénith du Niger",
+        "type_etablissement": "banque",
+        "profil_qualite": "excellent",
+        "taux_rejet": 0.005422153369481022,
+        "taux_reserve": 0.003098373353989156,
+        "nb_contrats": 2582,
+        "nb_rejetes": 14
+      }
     ],
-    "series": [
+    "top_erreurs": [
       {
-        "profil": "excellent",
-        "taux_rejet": [
-          0.014354066985645933,
-          0.004310344827586207,
-          0.001937984496124031,
-          0.0,
-          0.0052173913043478265,
-          0.004918032786885246,
-          0.0062402496099844,
-          0.004457652303120356,
-          0.008534850640113799,
-          0.002717391304347826,
-          0.007792207792207792,
-          0.008793969849246231
-        ]
+        "code": "E002",
+        "libelle_fr": "Format de date invalide",
+        "severite": "BLOQUANT",
+        "occurrences": 831
       },
       {
-        "profil": "moyen",
-        "taux_rejet": [
-          0.051932367149758456,
-          0.3796095444685466,
-          0.047244094488188976,
-          0.22539098436062557,
-          0.0627147766323024,
-          0.06097560975609756,
-          0.21472868217054264,
-          0.04681784930504755,
-          0.2077831827658096,
-          0.043478260869565216,
-          0.21849271690943636,
-          0.20561317876754118
-        ]
+        "code": "E004",
+        "libelle_fr": "Encours négatif",
+        "severite": "BLOQUANT",
+        "occurrences": 440
       },
       {
-        "profil": "defaillant",
-        "taux_rejet": [
-          0.17551963048498845,
-          0.4288659793814433,
-          0.7407407407407407,
-          0.488013698630137,
-          0.4935275080906149,
-          0.14241960183767227,
-          0.14074074074074075,
-          0.4755244755244755,
-          0.4725130890052356,
-          0.15894868585732166,
-          0.16,
-          0.4205069124423963
-        ]
+        "code": "E011",
+        "libelle_fr": "Date de naissance incohérente",
+        "severite": "MAJEUR",
+        "occurrences": 435
+      },
+      {
+        "code": "E008",
+        "libelle_fr": "Contrat référençant un emprunteur inexistant",
+        "severite": "BLOQUANT",
+        "occurrences": 428
+      },
+      {
+        "code": "E005",
+        "libelle_fr": "Encours supérieur au montant octroyé",
+        "severite": "MAJEUR",
+        "occurrences": 428
+      },
+      {
+        "code": "E006",
+        "libelle_fr": "Devise non autorisée",
+        "severite": "MAJEUR",
+        "occurrences": 424
+      },
+      {
+        "code": "E010",
+        "libelle_fr": "Numéro de pièce d'identité au format invalide",
+        "severite": "MAJEUR",
+        "occurrences": 423
+      },
+      {
+        "code": "E001",
+        "libelle_fr": "Champ obligatoire vide",
+        "severite": "BLOQUANT",
+        "occurrences": 418
+      },
+      {
+        "code": "E003",
+        "libelle_fr": "Montant non numérique",
+        "severite": "BLOQUANT",
+        "occurrences": 410
+      },
+      {
+        "code": "E014",
+        "libelle_fr": "Téléphone hors format national",
+        "severite": "MINEUR",
+        "occurrences": 396
+      }
+    ],
+    "repartition_severite": [
+      {
+        "severite": "BLOQUANT",
+        "occurrences": 2935,
+        "part": 0.5324746008708273
+      },
+      {
+        "severite": "MAJEUR",
+        "occurrences": 2181,
+        "part": 0.3956821480406386
+      },
+      {
+        "severite": "MINEUR",
+        "occurrences": 396,
+        "part": 0.07184325108853411
+      }
+    ],
+    "evolution_mensuelle": {
+      "arretes": [
+        "2025-08-31",
+        "2025-09-30",
+        "2025-10-31",
+        "2025-11-30",
+        "2025-12-31",
+        "2026-01-31",
+        "2026-02-28",
+        "2026-03-31",
+        "2026-04-30",
+        "2026-05-31",
+        "2026-06-30",
+        "2026-07-31"
+      ],
+      "series": [
+        {
+          "profil": "excellent",
+          "taux_anomalie_cible": 0.01,
+          "taux_rejet": [
+            0.014354066985645933,
+            0.004310344827586207,
+            0.001937984496124031,
+            0.0,
+            0.0052173913043478265,
+            0.004918032786885246,
+            0.0062402496099844,
+            0.004457652303120356,
+            0.008534850640113799,
+            0.002717391304347826,
+            0.007792207792207792,
+            0.008793969849246231
+          ]
+        },
+        {
+          "profil": "moyen",
+          "taux_anomalie_cible": 0.08,
+          "taux_rejet": [
+            0.051932367149758456,
+            0.3796095444685466,
+            0.047244094488188976,
+            0.22539098436062557,
+            0.0627147766323024,
+            0.06097560975609756,
+            0.21472868217054264,
+            0.04681784930504755,
+            0.2077831827658096,
+            0.043478260869565216,
+            0.21849271690943636,
+            0.20561317876754118
+          ]
+        },
+        {
+          "profil": "defaillant",
+          "taux_anomalie_cible": 0.25,
+          "taux_rejet": [
+            0.17551963048498845,
+            0.4288659793814433,
+            0.7407407407407407,
+            0.488013698630137,
+            0.4935275080906149,
+            0.14241960183767227,
+            0.14074074074074075,
+            0.4755244755244755,
+            0.4725130890052356,
+            0.15894868585732166,
+            0.16,
+            0.4205069124423963
+          ]
+        }
+      ]
+    },
+    "completude_par_champ": [
+      {
+        "champ": "identite_principale",
+        "libelle": "Nom / raison sociale",
+        "taux_completude": 0.9792112199731436,
+        "nb_manquants": 418
+      },
+      {
+        "champ": "piece_identification",
+        "libelle": "Pièce d'identité ou NIF",
+        "taux_completude": 0.9962202218132988,
+        "nb_manquants": 76
+      },
+      {
+        "champ": "telephone",
+        "libelle": "Téléphone",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      },
+      {
+        "champ": "date_octroi",
+        "libelle": "Date d'octroi",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      },
+      {
+        "champ": "date_echeance",
+        "libelle": "Date d'échéance",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      },
+      {
+        "champ": "montant_octroye",
+        "libelle": "Montant octroyé",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      },
+      {
+        "champ": "encours",
+        "libelle": "Encours",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      },
+      {
+        "champ": "classification",
+        "libelle": "Classification",
+        "taux_completude": 1.0,
+        "nb_manquants": 0
+      }
+    ],
+    "catalogue_regles": [
+      {
+        "code": "E001",
+        "libelle_fr": "Champ obligatoire vide",
+        "severite": "BLOQUANT",
+        "entites": "emprunteur"
+      },
+      {
+        "code": "E002",
+        "libelle_fr": "Format de date invalide",
+        "severite": "BLOQUANT",
+        "entites": "emprunteur, contrat"
+      },
+      {
+        "code": "E003",
+        "libelle_fr": "Montant non numérique",
+        "severite": "BLOQUANT",
+        "entites": "contrat"
+      },
+      {
+        "code": "E004",
+        "libelle_fr": "Encours négatif",
+        "severite": "BLOQUANT",
+        "entites": "contrat"
+      },
+      {
+        "code": "E005",
+        "libelle_fr": "Encours supérieur au montant octroyé",
+        "severite": "MAJEUR",
+        "entites": "contrat"
+      },
+      {
+        "code": "E006",
+        "libelle_fr": "Devise non autorisée",
+        "severite": "MAJEUR",
+        "entites": "contrat"
+      },
+      {
+        "code": "E007",
+        "libelle_fr": "Date d'échéance antérieure à la date d'octroi",
+        "severite": "BLOQUANT",
+        "entites": "contrat"
+      },
+      {
+        "code": "E008",
+        "libelle_fr": "Contrat référençant un emprunteur inexistant",
+        "severite": "BLOQUANT",
+        "entites": "contrat"
+      },
+      {
+        "code": "E009",
+        "libelle_fr": "Identifiant de contrat dupliqué",
+        "severite": "BLOQUANT",
+        "entites": "contrat"
+      },
+      {
+        "code": "E010",
+        "libelle_fr": "Numéro de pièce d'identité au format invalide",
+        "severite": "MAJEUR",
+        "entites": "emprunteur"
+      },
+      {
+        "code": "E011",
+        "libelle_fr": "Date de naissance incohérente",
+        "severite": "MAJEUR",
+        "entites": "emprunteur"
+      },
+      {
+        "code": "E012",
+        "libelle_fr": "Classification incohérente avec les jours de retard",
+        "severite": "MAJEUR",
+        "entites": "contrat"
+      },
+      {
+        "code": "E013",
+        "libelle_fr": "Code déclarant inconnu dans l'en-tête",
+        "severite": "BLOQUANT",
+        "entites": "entete"
+      },
+      {
+        "code": "E014",
+        "libelle_fr": "Téléphone hors format national",
+        "severite": "MINEUR",
+        "entites": "emprunteur"
+      },
+      {
+        "code": "E015",
+        "libelle_fr": "NIF manquant sur une personne morale",
+        "severite": "MAJEUR",
+        "entites": "emprunteur"
+      }
+    ],
+    "detection": {
+      "rappel_global": 0.9995907509719665,
+      "total_anomalies": 4887,
+      "total_detectees": 4885,
+      "par_code": [
+        {
+          "code": "E001",
+          "detectees": 355,
+          "injectees": 355,
+          "rappel": 1.0
+        },
+        {
+          "code": "E002",
+          "detectees": 739,
+          "injectees": 739,
+          "rappel": 1.0
+        },
+        {
+          "code": "E003",
+          "detectees": 393,
+          "injectees": 393,
+          "rappel": 1.0
+        },
+        {
+          "code": "E004",
+          "detectees": 399,
+          "injectees": 399,
+          "rappel": 1.0
+        },
+        {
+          "code": "E005",
+          "detectees": 384,
+          "injectees": 384,
+          "rappel": 1.0
+        },
+        {
+          "code": "E006",
+          "detectees": 382,
+          "injectees": 382,
+          "rappel": 1.0
+        },
+        {
+          "code": "E007",
+          "detectees": 346,
+          "injectees": 348,
+          "rappel": 0.9942528735632183
+        },
+        {
+          "code": "E008",
+          "detectees": 385,
+          "injectees": 385,
+          "rappel": 1.0
+        },
+        {
+          "code": "E009",
+          "detectees": 16,
+          "injectees": 16,
+          "rappel": 1.0
+        },
+        {
+          "code": "E010",
+          "detectees": 351,
+          "injectees": 351,
+          "rappel": 1.0
+        },
+        {
+          "code": "E011",
+          "detectees": 374,
+          "injectees": 374,
+          "rappel": 1.0
+        },
+        {
+          "code": "E012",
+          "detectees": 356,
+          "injectees": 356,
+          "rappel": 1.0
+        },
+        {
+          "code": "E013",
+          "detectees": 5,
+          "injectees": 5,
+          "rappel": 1.0
+        },
+        {
+          "code": "E014",
+          "detectees": 333,
+          "injectees": 333,
+          "rappel": 1.0
+        },
+        {
+          "code": "E015",
+          "detectees": 67,
+          "injectees": 67,
+          "rappel": 1.0
+        }
+      ]
+    }
+  },
+  "identite": {
+    "precision": 1.0,
+    "rappel": 1.0,
+    "f1": 1.0,
+    "vrais_positifs": 1112,
+    "faux_positifs": 0,
+    "faux_negatifs": 0,
+    "nb_enregistrements": 3000,
+    "nb_identites_predites": 2331,
+    "nb_identites_reelles": 2331,
+    "distribution_tailles": [
+      {
+        "nb_declarants": 1,
+        "nb_identites": 1995
+      },
+      {
+        "nb_declarants": 2,
+        "nb_identites": 113
+      },
+      {
+        "nb_declarants": 3,
+        "nb_identites": 113
+      },
+      {
+        "nb_declarants": 4,
+        "nb_identites": 110
       }
     ]
   },
-  "completude_par_champ": [
-    {
-      "champ": "identite_principale",
-      "taux_completude": 0.9792112199731436
+  "scoring": {
+    "auc": 0.6642058996502306,
+    "gini": 0.32841179930046116,
+    "ks": 0.29813972204166284,
+    "nb_emprunteurs_notes": 1505,
+    "taux_defaut_global": 0.19800664451827243,
+    "parametres": {
+      "pdo": 20,
+      "score_reference": 600,
+      "odds_reference": 50,
+      "score_min": 300,
+      "score_max": 850
     },
-    {
-      "champ": "piece_identification",
-      "taux_completude": 0.9962202218132988
-    },
-    {
-      "champ": "telephone",
-      "taux_completude": 1.0
-    },
-    {
-      "champ": "date_octroi",
-      "taux_completude": 1.0
-    },
-    {
-      "champ": "date_echeance",
-      "taux_completude": 1.0
-    },
-    {
-      "champ": "montant_octroye",
-      "taux_completude": 1.0
-    },
-    {
-      "champ": "encours",
-      "taux_completude": 1.0
-    },
-    {
-      "champ": "classification",
-      "taux_completude": 1.0
-    }
-  ],
-  "distribution_scores": {
-    "bandes": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
+    "variables": [
+      {
+        "nom": "nb_contrats_actifs",
+        "libelle": "Nombre de crédits en cours",
+        "iv": 0.26750418359545924,
+        "coefficient": -0.959075989961234,
+        "nb_classes": 3
+      },
+      {
+        "nom": "encours_total",
+        "libelle": "Encours total (capital restant dû)",
+        "iv": 0.13956009752955106,
+        "coefficient": -0.3050979163359067,
+        "nb_classes": 5
+      },
+      {
+        "nom": "nb_types_credit",
+        "libelle": "Diversité des types de crédit",
+        "iv": 0.11246115888070822,
+        "coefficient": 0.4750366970661883,
+        "nb_classes": 2
+      },
+      {
+        "nom": "anciennete_jours",
+        "libelle": "Ancienneté du plus ancien crédit (jours)",
+        "iv": 0.09434368871111734,
+        "coefficient": -0.524852235522398,
+        "nb_classes": 5
+      },
+      {
+        "nom": "taux_couverture_garantie",
+        "libelle": "Part du crédit couverte par une garantie",
+        "iv": 0.0619046937480098,
+        "coefficient": -0.4198409405021893,
+        "nb_classes": 4
+      }
     ],
-    "nb_emprunteurs": [
-      340,
-      292,
-      298,
-      278,
-      297
+    "courbe_roc": [
+      {
+        "fpr": 0.0,
+        "tpr": 0.0
+      },
+      {
+        "fpr": 0.005509641873278237,
+        "tpr": 0.02247191011235955
+      },
+      {
+        "fpr": 0.013774104683195593,
+        "tpr": 0.02247191011235955
+      },
+      {
+        "fpr": 0.013774104683195593,
+        "tpr": 0.0449438202247191
+      },
+      {
+        "fpr": 0.024793388429752067,
+        "tpr": 0.07865168539325842
+      },
+      {
+        "fpr": 0.03581267217630854,
+        "tpr": 0.0898876404494382
+      },
+      {
+        "fpr": 0.03856749311294766,
+        "tpr": 0.10112359550561797
+      },
+      {
+        "fpr": 0.046831955922865015,
+        "tpr": 0.11235955056179775
+      },
+      {
+        "fpr": 0.049586776859504134,
+        "tpr": 0.12359550561797752
+      },
+      {
+        "fpr": 0.049586776859504134,
+        "tpr": 0.1348314606741573
+      },
+      {
+        "fpr": 0.05234159779614325,
+        "tpr": 0.14606741573033707
+      },
+      {
+        "fpr": 0.06336088154269973,
+        "tpr": 0.16853932584269662
+      },
+      {
+        "fpr": 0.06611570247933884,
+        "tpr": 0.19101123595505617
+      },
+      {
+        "fpr": 0.07162534435261708,
+        "tpr": 0.21348314606741572
+      },
+      {
+        "fpr": 0.08539944903581267,
+        "tpr": 0.2247191011235955
+      },
+      {
+        "fpr": 0.09090909090909091,
+        "tpr": 0.23595505617977527
+      },
+      {
+        "fpr": 0.09090909090909091,
+        "tpr": 0.24719101123595505
+      },
+      {
+        "fpr": 0.09641873278236915,
+        "tpr": 0.24719101123595505
+      },
+      {
+        "fpr": 0.10192837465564739,
+        "tpr": 0.25842696629213485
+      },
+      {
+        "fpr": 0.1046831955922865,
+        "tpr": 0.30337078651685395
+      },
+      {
+        "fpr": 0.10743801652892562,
+        "tpr": 0.3258426966292135
+      },
+      {
+        "fpr": 0.11019283746556474,
+        "tpr": 0.33707865168539325
+      },
+      {
+        "fpr": 0.11294765840220386,
+        "tpr": 0.33707865168539325
+      },
+      {
+        "fpr": 0.12396694214876033,
+        "tpr": 0.33707865168539325
+      },
+      {
+        "fpr": 0.12947658402203857,
+        "tpr": 0.34831460674157305
+      },
+      {
+        "fpr": 0.1322314049586777,
+        "tpr": 0.34831460674157305
+      },
+      {
+        "fpr": 0.13774104683195593,
+        "tpr": 0.34831460674157305
+      },
+      {
+        "fpr": 0.14325068870523416,
+        "tpr": 0.3595505617977528
+      },
+      {
+        "fpr": 0.14600550964187328,
+        "tpr": 0.3707865168539326
+      },
+      {
+        "fpr": 0.15426997245179064,
+        "tpr": 0.38202247191011235
+      },
+      {
+        "fpr": 0.162534435261708,
+        "tpr": 0.4606741573033708
+      },
+      {
+        "fpr": 0.19559228650137742,
+        "tpr": 0.47191011235955055
+      },
+      {
+        "fpr": 0.21487603305785125,
+        "tpr": 0.4943820224719101
+      },
+      {
+        "fpr": 0.23140495867768596,
+        "tpr": 0.4943820224719101
+      },
+      {
+        "fpr": 0.2534435261707989,
+        "tpr": 0.5056179775280899
+      },
+      {
+        "fpr": 0.30303030303030304,
+        "tpr": 0.5617977528089888
+      },
+      {
+        "fpr": 0.3278236914600551,
+        "tpr": 0.5730337078651685
+      },
+      {
+        "fpr": 0.371900826446281,
+        "tpr": 0.6404494382022472
+      },
+      {
+        "fpr": 0.4462809917355372,
+        "tpr": 0.6741573033707865
+      },
+      {
+        "fpr": 0.4931129476584022,
+        "tpr": 0.6966292134831461
+      },
+      {
+        "fpr": 0.5261707988980716,
+        "tpr": 0.7078651685393258
+      },
+      {
+        "fpr": 0.5454545454545454,
+        "tpr": 0.7303370786516854
+      },
+      {
+        "fpr": 0.6170798898071626,
+        "tpr": 0.7752808988764045
+      },
+      {
+        "fpr": 0.6666666666666666,
+        "tpr": 0.7865168539325843
+      },
+      {
+        "fpr": 0.7052341597796143,
+        "tpr": 0.8426966292134831
+      },
+      {
+        "fpr": 0.7355371900826446,
+        "tpr": 0.8876404494382022
+      },
+      {
+        "fpr": 0.7741046831955923,
+        "tpr": 0.8876404494382022
+      },
+      {
+        "fpr": 0.8236914600550964,
+        "tpr": 0.9325842696629213
+      },
+      {
+        "fpr": 0.8539944903581267,
+        "tpr": 0.9550561797752809
+      },
+      {
+        "fpr": 0.8815426997245179,
+        "tpr": 0.9550561797752809
+      },
+      {
+        "fpr": 0.928374655647383,
+        "tpr": 0.9550561797752809
+      },
+      {
+        "fpr": 0.9807162534435262,
+        "tpr": 0.9887640449438202
+      },
+      {
+        "fpr": 1.0,
+        "tpr": 1.0
+      }
     ],
-    "taux_defaut_observe": [
-      0.10882352941176471,
-      0.14726027397260275,
-      0.1644295302013423,
-      0.20503597122302158,
-      0.3771043771043771
+    "table_gains": [
+      {
+        "decile": 9,
+        "nb_emprunteurs": 30,
+        "nb_defauts": 4,
+        "taux_defaut": 0.13333333333333333
+      },
+      {
+        "decile": 8,
+        "nb_emprunteurs": 40,
+        "nb_defauts": 2,
+        "taux_defaut": 0.05
+      },
+      {
+        "decile": 7,
+        "nb_emprunteurs": 51,
+        "nb_defauts": 8,
+        "taux_defaut": 0.1568627450980392
+      },
+      {
+        "decile": 6,
+        "nb_emprunteurs": 38,
+        "nb_defauts": 6,
+        "taux_defaut": 0.15789473684210525
+      },
+      {
+        "decile": 5,
+        "nb_emprunteurs": 52,
+        "nb_defauts": 7,
+        "taux_defaut": 0.1346153846153846
+      },
+      {
+        "decile": 4,
+        "nb_emprunteurs": 49,
+        "nb_defauts": 5,
+        "taux_defaut": 0.10204081632653061
+      },
+      {
+        "decile": 3,
+        "nb_emprunteurs": 55,
+        "nb_defauts": 12,
+        "taux_defaut": 0.21818181818181817
+      },
+      {
+        "decile": 2,
+        "nb_emprunteurs": 37,
+        "nb_defauts": 4,
+        "taux_defaut": 0.10810810810810811
+      },
+      {
+        "decile": 1,
+        "nb_emprunteurs": 49,
+        "nb_defauts": 21,
+        "taux_defaut": 0.42857142857142855
+      },
+      {
+        "decile": 0,
+        "nb_emprunteurs": 51,
+        "nb_defauts": 20,
+        "taux_defaut": 0.39215686274509803
+      }
+    ],
+    "histogramme_scores": [
+      {
+        "borne_inf": 480.9,
+        "borne_sup": 483.8,
+        "nb_emprunteurs": 14
+      },
+      {
+        "borne_inf": 483.8,
+        "borne_sup": 486.7,
+        "nb_emprunteurs": 2
+      },
+      {
+        "borne_inf": 486.7,
+        "borne_sup": 489.5,
+        "nb_emprunteurs": 6
+      },
+      {
+        "borne_inf": 489.5,
+        "borne_sup": 492.3,
+        "nb_emprunteurs": 5
+      },
+      {
+        "borne_inf": 492.3,
+        "borne_sup": 495.2,
+        "nb_emprunteurs": 53
+      },
+      {
+        "borne_inf": 495.2,
+        "borne_sup": 498.0,
+        "nb_emprunteurs": 32
+      },
+      {
+        "borne_inf": 498.0,
+        "borne_sup": 500.8,
+        "nb_emprunteurs": 14
+      },
+      {
+        "borne_inf": 500.8,
+        "borne_sup": 503.7,
+        "nb_emprunteurs": 33
+      },
+      {
+        "borne_inf": 503.7,
+        "borne_sup": 506.5,
+        "nb_emprunteurs": 22
+      },
+      {
+        "borne_inf": 506.5,
+        "borne_sup": 509.3,
+        "nb_emprunteurs": 25
+      },
+      {
+        "borne_inf": 509.3,
+        "borne_sup": 512.2,
+        "nb_emprunteurs": 14
+      },
+      {
+        "borne_inf": 512.2,
+        "borne_sup": 515.0,
+        "nb_emprunteurs": 25
+      },
+      {
+        "borne_inf": 515.0,
+        "borne_sup": 517.8,
+        "nb_emprunteurs": 21
+      },
+      {
+        "borne_inf": 517.8,
+        "borne_sup": 520.7,
+        "nb_emprunteurs": 19
+      },
+      {
+        "borne_inf": 520.7,
+        "borne_sup": 523.5,
+        "nb_emprunteurs": 18
+      },
+      {
+        "borne_inf": 523.5,
+        "borne_sup": 526.3,
+        "nb_emprunteurs": 95
+      },
+      {
+        "borne_inf": 526.3,
+        "borne_sup": 529.2,
+        "nb_emprunteurs": 85
+      },
+      {
+        "borne_inf": 529.2,
+        "borne_sup": 532.0,
+        "nb_emprunteurs": 157
+      },
+      {
+        "borne_inf": 532.0,
+        "borne_sup": 534.8,
+        "nb_emprunteurs": 159
+      },
+      {
+        "borne_inf": 534.8,
+        "borne_sup": 537.7,
+        "nb_emprunteurs": 180
+      },
+      {
+        "borne_inf": 537.7,
+        "borne_sup": 540.5,
+        "nb_emprunteurs": 186
+      },
+      {
+        "borne_inf": 540.5,
+        "borne_sup": 543.3,
+        "nb_emprunteurs": 163
+      },
+      {
+        "borne_inf": 543.3,
+        "borne_sup": 546.2,
+        "nb_emprunteurs": 106
+      },
+      {
+        "borne_inf": 546.2,
+        "borne_sup": 549.0,
+        "nb_emprunteurs": 71
+      }
+    ],
+    "bandes_risque": [
+      {
+        "bande": "A",
+        "nb_emprunteurs": 340,
+        "taux_defaut_observe": 0.10882352941176471,
+        "score_plancher": 541
+      },
+      {
+        "bande": "B",
+        "nb_emprunteurs": 292,
+        "taux_defaut_observe": 0.14726027397260275,
+        "score_plancher": 537
+      },
+      {
+        "bande": "C",
+        "nb_emprunteurs": 298,
+        "taux_defaut_observe": 0.1644295302013423,
+        "score_plancher": 532
+      },
+      {
+        "bande": "D",
+        "nb_emprunteurs": 278,
+        "taux_defaut_observe": 0.20503597122302158,
+        "score_plancher": 523
+      },
+      {
+        "bande": "E",
+        "nb_emprunteurs": 297,
+        "taux_defaut_observe": 0.3771043771043771,
+        "score_plancher": 481
+      }
     ]
   }
 }

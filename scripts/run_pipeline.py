@@ -4,6 +4,10 @@ Enchaîne : génération -> export XML -> validation -> chargement -> résolutio
 d'identité -> scoring -> tableau de bord, avec des logs clairs à chaque étape.
 ``MYSQL_HOST`` est optionnel : sans base MySQL disponible (sandbox local),
 le chargement en base est simplement sauté.
+
+Toutes les métriques publiées (rappel du moteur de validation, précision de
+l'appariement, performance du modèle) sont mesurées ici, à chaque exécution,
+contre la vérité-terrain que le générateur journalise.
 """
 
 from __future__ import annotations
@@ -15,12 +19,16 @@ import logging
 import os
 from pathlib import Path
 
+import pandas as pd
+from sqlalchemy.orm import Session
+
 from bic.db import create_all_tables, create_db_engine, get_session_factory
 from bic.generator.anomalies import assembler_declarations, injecter_anomalies
 from bic.generator.export_xml import construire_arbre_xml, exporter_declarations
-from bic.generator.profiles import get_declarant_profiles
-from bic.generator.synthetic import generer_jeu_de_donnees, liste_arretes
+from bic.generator.profiles import ProfilDeclarant, get_declarant_profiles
+from bic.generator.synthetic import JeuDeDonnees, generer_jeu_de_donnees, liste_arretes
 from bic.identity.cluster import EmprunteurAResoudre, resoudre_identites
+from bic.identity.evaluation import evaluer_appariement
 from bic.models import Declarant, TypeEtablissement
 from bic.reporting.dashboard import construire_donnees_dashboard
 from bic.reporting.rejets import ecrire_csv_rejets, ecrire_rapport_html
@@ -28,6 +36,7 @@ from bic.scoring.evaluate import evaluer, separer_train_test
 from bic.scoring.features import COLONNES_FEATURES, construire_jeu_de_features
 from bic.scoring.scorecard import calculer_score, entrainer_scorecard
 from bic.validation.engine import valider_et_charger, valider_fichier
+from bic.validation.evaluation import evaluer_detection
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("bic.pipeline")
@@ -42,7 +51,7 @@ def _analyser_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _preparer_session_db(profiles: list) -> object | None:
+def _preparer_session_db(profiles: list[ProfilDeclarant]) -> Session | None:
     """Crée le schéma et les déclarants en base si MYSQL_HOST est défini, sinon None."""
     if not os.environ.get("MYSQL_HOST"):
         logger.info(
@@ -67,6 +76,23 @@ def _preparer_session_db(profiles: list) -> object | None:
     session.commit()
     logger.info("MYSQL_HOST détecté : les enregistrements acceptés seront chargés en base.")
     return session
+
+
+def _entrees_identite(jeu: JeuDeDonnees) -> list[EmprunteurAResoudre]:
+    """Convertit les emprunteurs générés en entrées pour la résolution d'identité."""
+    return [
+        EmprunteurAResoudre(
+            cle=f"{e.code_declarant}:{e.id_emprunteur_source}",
+            type_personne=e.type_personne,
+            nom=e.nom,
+            prenom=e.prenom,
+            raison_sociale=e.raison_sociale,
+            date_naissance=e.date_naissance.isoformat() if e.date_naissance else None,
+            numero_piece=e.numero_piece,
+            nif=e.nif,
+        )
+        for e in jeu.emprunteurs
+    ]
 
 
 def main() -> None:
@@ -128,30 +154,32 @@ def main() -> None:
     total_contrats = sum(r.nombre_contrats for r in rapports)
     total_acceptes = sum(r.nombre_contrats_acceptes + r.nombre_contrats_reserve for r in rapports)
     taux_global = 100 * total_acceptes / total_contrats if total_contrats else 0.0
+    metriques_validation = evaluer_detection(journal_anomalies, rapports)
     logger.info(
-        "%d fichiers validés, taux d'acceptation global : %.1f%%", len(rapports), taux_global
+        "%d fichiers validés, taux d'acceptation global : %.1f%% — rappel du moteur : %.2f%% "
+        "(%d/%d anomalies retrouvées)",
+        len(rapports),
+        taux_global,
+        100 * metriques_validation.rappel_global,
+        metriques_validation.total_detectees,
+        metriques_validation.total_anomalies,
     )
 
     logger.info("=== 4/6 Résolution d'identité ===")
-    entrees = [
-        EmprunteurAResoudre(
-            cle=f"{e.code_declarant}:{e.id_emprunteur_source}",
-            type_personne=e.type_personne,
-            nom=e.nom,
-            prenom=e.prenom,
-            raison_sociale=e.raison_sociale,
-            date_naissance=e.date_naissance.isoformat() if e.date_naissance else None,
-            numero_piece=e.numero_piece,
-            nif=e.nif,
-        )
-        for e in jeu.emprunteurs
-    ]
+    entrees = _entrees_identite(jeu)
     mapping_bic = resoudre_identites(entrees)
-    nb_emprunteurs_consolides = len(set(mapping_bic.values()))
+    verite_identite = {
+        f"{e.code_declarant}:{e.id_emprunteur_source}": e.identite_verite for e in jeu.emprunteurs
+    }
+    metriques_identite = evaluer_appariement(mapping_bic, verite_identite)
     logger.info(
-        "%d emprunteurs déclarés consolidés en %d identités uniques.",
+        "%d emprunteurs déclarés consolidés en %d identités uniques "
+        "(précision %.1f%%, rappel %.1f%%, F1 %.3f).",
         len(entrees),
-        nb_emprunteurs_consolides,
+        metriques_identite.nb_identites_predites,
+        100 * metriques_identite.precision,
+        100 * metriques_identite.rappel,
+        metriques_identite.f1,
     )
 
     logger.info("=== 5/6 Scoring de solvabilité ===")
@@ -160,30 +188,43 @@ def main() -> None:
     )
     train, test = separer_train_test(features)
     scorecard = entrainer_scorecard(train, COLONNES_FEATURES)
-    scores_test = test.apply(
-        lambda ligne: calculer_score(scorecard, ligne[COLONNES_FEATURES].to_dict())[0], axis=1
-    )
-    resultat_evaluation = evaluer(scores_test, test["defaut"])
+
+    def _noter(lignes: pd.DataFrame) -> pd.Series:
+        return lignes.apply(
+            lambda ligne: calculer_score(scorecard, ligne[COLONNES_FEATURES].to_dict())[0], axis=1
+        )
+
+    resultat_evaluation = evaluer(_noter(test), test["defaut"])
     logger.info(
-        "AUC : %.3f  Gini : %.3f  KS : %.3f  (%d emprunteurs notés)",
+        "AUC : %.3f  Gini : %.3f  KS : %.3f  (%d emprunteurs notés, %.1f%% de défaut observé)",
         resultat_evaluation.auc,
         resultat_evaluation.gini,
         resultat_evaluation.ks,
         len(features),
+        100 * features["defaut"].mean(),
     )
 
     logger.info("=== 6/6 Génération du tableau de bord ===")
-    scores_tous = features.apply(
-        lambda ligne: calculer_score(scorecard, ligne[COLONNES_FEATURES].to_dict())[0], axis=1
-    )
     donnees_dashboard = construire_donnees_dashboard(
         declarations=declarations,
         rapports=rapports,
         profiles=profiles,
-        nb_emprunteurs_consolides=nb_emprunteurs_consolides,
         features=features,
-        scores=scores_tous,
-        auc=resultat_evaluation.auc,
+        scores=_noter(features),
+        scorecard=scorecard,
+        evaluation=resultat_evaluation,
+        metriques_identite=metriques_identite,
+        metriques_validation=metriques_validation,
+        mapping_bic=mapping_bic,
+        volumetrie={
+            "nb_declarants": len(profiles),
+            "nb_emprunteurs_declares": len(jeu.emprunteurs),
+            "nb_contrats": len(jeu.contrats),
+            "nb_situations": len(jeu.situations),
+            "nb_fichiers_declaration": len(fichiers),
+            "nb_anomalies_injectees": len(journal_anomalies),
+        },
+        seed=args.seed,
     )
     DOSSIER_DOCS_DATA.mkdir(parents=True, exist_ok=True)
     (DOSSIER_DOCS_DATA / "dashboard.json").write_text(

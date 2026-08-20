@@ -9,6 +9,7 @@ from bic.generator.profiles import get_declarant_profiles
 from bic.generator.synthetic import generer_jeu_de_donnees
 from bic.identity.blocking import cle_phonetique_simplifiee, cles_de_blocage
 from bic.identity.cluster import EmprunteurAResoudre, resoudre_identites
+from bic.identity.evaluation import distribution_taille_clusters, evaluer_appariement
 from bic.identity.match import comparer
 from bic.identity.normalize import normaliser_identifiant, normaliser_nom, normaliser_nom_complet
 
@@ -133,70 +134,40 @@ def test_precision_rappel_f1_sur_verite_terrain() -> None:
     }
 
     predictions = resoudre_identites(entrees)
+    metriques = evaluer_appariement(predictions, verite_par_cle)
 
-    vrais_positifs = faux_positifs = faux_negatifs = 0
-
-    par_cluster_predit: dict[str, list[str]] = {}
-    for cle, id_bic in predictions.items():
-        par_cluster_predit.setdefault(id_bic, []).append(cle)
-
-    for membres in par_cluster_predit.values():
-        n = len(membres)
-        if n < 2:
-            continue
-        paires_predites_total = n * (n - 1) // 2
-        compte_par_verite: dict[int, int] = {}
-        for cle in membres:
-            verite = verite_par_cle[cle]
-            compte_par_verite[verite] = compte_par_verite.get(verite, 0) + 1
-        paires_correctes = sum(c * (c - 1) // 2 for c in compte_par_verite.values())
-        vrais_positifs += paires_correctes
-        faux_positifs += paires_predites_total - paires_correctes
-
-    par_cluster_verite: dict[int, list[str]] = {}
-    for cle, verite in verite_par_cle.items():
-        par_cluster_verite.setdefault(verite, []).append(cle)
-
-    total_paires_verite = 0
-    for membres in par_cluster_verite.values():
-        n = len(membres)
-        if n < 2:
-            continue
-        total_paires_verite += n * (n - 1) // 2
-    faux_negatifs = total_paires_verite - vrais_positifs
-
-    precision = (
-        vrais_positifs / (vrais_positifs + faux_positifs)
-        if (vrais_positifs + faux_positifs)
-        else 1.0
+    print(
+        f"\nPrécision : {metriques.precision:.3f}  "
+        f"Rappel : {metriques.rappel:.3f}  F1 : {metriques.f1:.3f}"
     )
-    rappel = (
-        vrais_positifs / (vrais_positifs + faux_negatifs)
-        if (vrais_positifs + faux_negatifs)
-        else 1.0
+    print(
+        f"VP={metriques.vrais_positifs} FP={metriques.faux_positifs} FN={metriques.faux_negatifs}"
     )
-    f1 = 2 * precision * rappel / (precision + rappel) if (precision + rappel) else 0.0
-
-    print(f"\nPrécision : {precision:.3f}  Rappel : {rappel:.3f}  F1 : {f1:.3f}")
-    print(f"VP={vrais_positifs} FP={faux_positifs} FN={faux_negatifs}")
 
     DOSSIER_SORTIE.mkdir(parents=True, exist_ok=True)
     (DOSSIER_SORTIE / "identity_metrics.json").write_text(
-        json.dumps(
-            {
-                "precision": precision,
-                "rappel": rappel,
-                "f1": f1,
-                "vrais_positifs": vrais_positifs,
-                "faux_positifs": faux_positifs,
-                "faux_negatifs": faux_negatifs,
-            },
-            indent=2,
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
+        json.dumps(metriques.as_dict(), indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
-    assert precision >= SEUIL_PRECISION_MINIMALE, (
-        f"Précision {precision:.1%} < seuil {SEUIL_PRECISION_MINIMALE:.0%}"
+    assert metriques.precision >= SEUIL_PRECISION_MINIMALE, (
+        f"Précision {metriques.precision:.1%} < seuil {SEUIL_PRECISION_MINIMALE:.0%}"
     )
+
+
+def test_distribution_taille_clusters_totalise_les_enregistrements() -> None:
+    """La distribution des tailles de clusters doit couvrir tous les enregistrements."""
+    entrees = [
+        EmprunteurAResoudre(
+            "A", "PP", "Issoufou", "Amadou", None, "1985-04-12", "NE-CNI-12345678", None
+        ),
+        EmprunteurAResoudre(
+            "B", "PP", "ISSOUFOU", "A.", None, "1985-04-12", "NE-CNI-12345678", None
+        ),
+        EmprunteurAResoudre(
+            "C", "PP", "Traore", "Fatimata", None, "1970-06-01", "NE-CNI-99999999", None
+        ),
+    ]
+    distribution = distribution_taille_clusters(resoudre_identites(entrees))
+
+    assert sum(taille * nb for taille, nb in distribution.items()) == len(entrees)
+    assert distribution == {1: 1, 2: 1}

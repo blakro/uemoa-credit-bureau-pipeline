@@ -404,6 +404,28 @@ def regles_pour_entite(entite: str) -> tuple[RegleMetier, ...]:
     return tuple(regle for regle in REGLES if regle.entite == entite)
 
 
+def catalogue_regles() -> list[dict[str, str]]:
+    """Catalogue dédupliqué des règles, trié par code — pour la documentation et le dashboard.
+
+    Un même code peut être porté par plusieurs règles (E002 vaut pour la date de
+    naissance d'un emprunteur comme pour les dates d'un contrat) ; le catalogue
+    n'en garde qu'une entrée, en fusionnant les entités concernées.
+    """
+    par_code: dict[str, dict[str, str]] = {}
+    for regle in REGLES:
+        entree = par_code.get(regle.code)
+        if entree is None:
+            par_code[regle.code] = {
+                "code": regle.code,
+                "libelle_fr": regle.libelle_fr,
+                "severite": regle.severite,
+                "entites": regle.entite,
+            }
+        elif regle.entite not in entree["entites"]:
+            entree["entites"] = f"{entree['entites']}, {regle.entite}"
+    return [par_code[code] for code in sorted(par_code)]
+
+
 def evaluer_regles(
     entite: str, identifiant: str, champs: dict[str, str], contexte: ContexteFichier
 ) -> list[Constat]:

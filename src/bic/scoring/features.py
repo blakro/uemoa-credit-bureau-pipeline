@@ -27,6 +27,19 @@ COLONNES_FEATURES: list[str] = [
     "nb_types_credit",
 ]
 
+#: Libellés lisibles des variables, pour les rapports et le tableau de bord.
+LIBELLES_FEATURES: dict[str, str] = {
+    "nb_declarants": "Nombre d'établissements prêteurs",
+    "nb_contrats_actifs": "Nombre de crédits en cours",
+    "encours_total": "Encours total (capital restant dû)",
+    "ratio_impaye_encours": "Part des impayés dans l'encours",
+    "max_jours_retard": "Retard maximum observé (jours)",
+    "nb_mois_douteux_ou_pire": "Mois passés en douteux ou contentieux",
+    "anciennete_jours": "Ancienneté du plus ancien crédit (jours)",
+    "taux_couverture_garantie": "Part du crédit couverte par une garantie",
+    "nb_types_credit": "Diversité des types de crédit",
+}
+
 
 def construire_jeu_de_features(
     contrats: list[ContratRecord],
