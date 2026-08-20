@@ -17,9 +17,7 @@ from bic.db import create_all_tables, create_db_engine, get_session_factory
 from bic.models import Base
 
 
-def pytest_collection_modifyitems(
-    config: pytest.Config, items: list[pytest.Item]
-) -> None:
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Skippe automatiquement les tests d'intégration quand MySQL n'est pas disponible."""
     if os.environ.get("MYSQL_HOST"):
         return
