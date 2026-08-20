@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:documentation xml:lang="fr">
+      Schéma de structure d'un fichier de déclaration mensuelle au Bureau
+      d'Information sur le Crédit (BIC) de la zone UEMOA. Un fichier
+      correspond à un déclarant et un arrêté. Ce schéma valide la structure
+      et le format des champs ; les règles métier de cohérence (montants,
+      dates croisées, référentiels) sont appliquées séparément par le
+      moteur de règles, après cette validation structurelle.
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- ============================= Types simples ============================= -->
+
+  <xs:simpleType name="DateOuVide">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">
+        Une date au format ISO (AAAA-MM-JJ), ou une chaîne vide lorsque la
+        date n'est pas applicable (ex. date de naissance d'une personne
+        morale).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:date" />
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:simpleType name="CodeDeclarant">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Code d'identification du déclarant (2 lettres + 6 chiffres).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TypePersonne">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Personne physique (PP) ou personne morale (PM).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PP" />
+      <xs:enumeration value="PM" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NumeroPiece">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">
+        Numéro de pièce d'identité au format national (ex. NE-CNI-12345678),
+        ou vide lorsque non applicable.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z]{2}-[A-Z]+-\d{8})?" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Telephone">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Numéro de téléphone au format international national (+227XXXXXXXX).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\+\d{3}\d{8}" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Devise">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Devise du contrat. Seul le franc CFA (XOF) est autorisé pour une déclaration UEMOA.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="XOF" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TypeCredit">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Nature du concours accordé.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="court_terme" />
+      <xs:enumeration value="moyen_terme" />
+      <xs:enumeration value="long_terme" />
+      <xs:enumeration value="decouvert" />
+      <xs:enumeration value="credit_bail" />
+      <xs:enumeration value="engagement_signature" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Periodicite">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Périodicité de remboursement du contrat.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mensuelle" />
+      <xs:enumeration value="trimestrielle" />
+      <xs:enumeration value="semestrielle" />
+      <xs:enumeration value="annuelle" />
+      <xs:enumeration value="in_fine" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TypeGarantie">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Nature de la garantie adossée au contrat.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="hypotheque" />
+      <xs:enumeration value="nantissement" />
+      <xs:enumeration value="caution" />
+      <xs:enumeration value="gage" />
+      <xs:enumeration value="aucune" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Classification">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Classification BCEAO de la qualité de l'encours à l'arrêté.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="sain" />
+      <xs:enumeration value="sensible" />
+      <xs:enumeration value="douteux" />
+      <xs:enumeration value="contentieux" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Montant">
+    <xs:annotation>
+      <xs:documentation xml:lang="fr">Montant en francs CFA, deux décimales, jamais négatif.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:fractionDigits value="2" />
+      <xs:minInclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ============================= Emprunteur ============================= -->
+
+  <xs:complexType name="Emprunteur">
+    <xs:sequence>
+      <xs:element name="id_emprunteur_source" type="xs:string">
+        <xs:annotation><xs:documentation xml:lang="fr">Identifiant de l'emprunteur chez le déclarant.</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="type_personne" type="TypePersonne" />
+      <xs:element name="nom" type="xs:string">
+        <xs:annotation><xs:documentation xml:lang="fr">Nom de famille (personne physique).</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="prenom" type="xs:string" />
+      <xs:element name="raison_sociale" type="xs:string">
+        <xs:annotation><xs:documentation xml:lang="fr">Dénomination sociale (personne morale).</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="date_naissance" type="DateOuVide" />
+      <xs:element name="sexe" type="xs:string" />
+      <xs:element name="type_piece" type="xs:string" />
+      <xs:element name="numero_piece" type="NumeroPiece" />
+      <xs:element name="nif" type="xs:string">
+        <xs:annotation><xs:documentation xml:lang="fr">Numéro d'identification fiscale.</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="telephone" type="Telephone" />
+      <xs:element name="ville" type="xs:string" />
+      <xs:element name="pays" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ============================= Contrat ============================= -->
+
+  <xs:complexType name="Contrat">
+    <xs:sequence>
+      <xs:element name="id_contrat_source" type="xs:string" />
+      <xs:element name="id_emprunteur_source" type="xs:string" />
+      <xs:element name="type_credit" type="TypeCredit" />
+      <xs:element name="date_octroi" type="xs:date" />
+      <xs:element name="date_echeance" type="xs:date" />
+      <xs:element name="montant_octroye" type="Montant" />
+      <xs:element name="devise" type="Devise" />
+      <xs:element name="taux_interet" type="xs:decimal">
+        <xs:annotation><xs:documentation xml:lang="fr">Taux d'intérêt annuel, en pourcentage.</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="periodicite" type="Periodicite" />
+      <xs:element name="type_garantie" type="TypeGarantie" />
+      <xs:element name="montant_garantie" type="Montant" />
+      <xs:element name="date_arrete" type="xs:date">
+        <xs:annotation><xs:documentation xml:lang="fr">Date de l'arrêté auquel se rapporte cette situation.</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="encours" type="Montant">
+        <xs:annotation><xs:documentation xml:lang="fr">Capital restant dû à l'arrêté.</xs:documentation></xs:annotation>
+      </xs:element>
+      <xs:element name="montant_impaye" type="Montant" />
+      <xs:element name="jours_retard" type="xs:nonNegativeInteger" />
+      <xs:element name="classification" type="Classification" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ============================= En-tête ============================= -->
+
+  <xs:complexType name="Entete">
+    <xs:sequence>
+      <xs:element name="code_declarant" type="CodeDeclarant" />
+      <xs:element name="date_arrete" type="xs:date" />
+      <xs:element name="nombre_enregistrements" type="xs:nonNegativeInteger" />
+      <xs:element name="horodatage" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ============================= Déclaration ============================= -->
+
+  <xs:element name="declaration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="entete" type="Entete" />
+        <xs:element name="emprunteurs">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="emprunteur" type="Emprunteur" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="contrats">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="contrat" type="Contrat" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
