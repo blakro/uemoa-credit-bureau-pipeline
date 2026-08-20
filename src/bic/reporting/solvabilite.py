@@ -5,17 +5,30 @@ from __future__ import annotations
 import html
 from pathlib import Path
 
+#: Bornes par défaut, calées sur l'échelle 300-850 classique. Un portefeuille
+#: réel recalibre ces bornes sur la distribution effective de ses scores
+#: (voir `calculer_cutoffs_bandes`) : c'est ce que fait le pipeline complet.
+BORNES_PAR_DEFAUT = (750, 700, 650, 600)
 
-def bande_de_risque(score: int) -> str:
-    """Convertit un score (300-850) en bande de risque A (meilleure) à E (pire)."""
-    if score >= 750:
-        return "A"
-    if score >= 700:
-        return "B"
-    if score >= 650:
-        return "C"
-    if score >= 600:
-        return "D"
+
+def calculer_cutoffs_bandes(scores) -> tuple[float, float, float, float]:
+    """Calcule les bornes A-E par quintiles de la distribution de scores observée.
+
+    Recalibrer les bandes sur le portefeuille réel évite qu'une échelle
+    absolue, pensée pour une population de référence plus sûre, n'écrase
+    tout le monde dans la pire bande.
+    """
+    quantiles = scores.quantile([0.8, 0.6, 0.4, 0.2]).tolist()
+    return tuple(quantiles)  # type: ignore[return-value]
+
+
+def bande_de_risque(
+    score: int, bornes: tuple[float, float, float, float] = BORNES_PAR_DEFAUT
+) -> str:
+    """Convertit un score en bande de risque A (meilleure) à E (pire), selon `bornes`."""
+    for lettre, borne in zip("ABCD", bornes, strict=True):
+        if score >= borne:
+            return lettre
     return "E"
 
 
@@ -25,9 +38,10 @@ def generer_rapport_solvabilite(
     contributions: list[tuple[str, float]],
     engagements: list[dict[str, str]],
     historique_retards: list[dict[str, object]],
+    bornes_bandes: tuple[float, float, float, float] = BORNES_PAR_DEFAUT,
 ) -> str:
     """Génère un rapport de solvabilité HTML autonome pour un emprunteur consolidé."""
-    bande = bande_de_risque(score)
+    bande = bande_de_risque(score, bornes_bandes)
     lignes_facteurs = (
         "".join(
             f"<tr><td>{html.escape(nom)}</td><td>{points:+.0f} points</td></tr>"
@@ -102,12 +116,13 @@ def ecrire_rapport_solvabilite(
     contributions: list[tuple[str, float]],
     engagements: list[dict[str, str]],
     historique_retards: list[dict[str, object]],
+    bornes_bandes: tuple[float, float, float, float] = BORNES_PAR_DEFAUT,
 ) -> None:
     """Écrit le rapport de solvabilité HTML sur disque."""
     chemin.parent.mkdir(parents=True, exist_ok=True)
     chemin.write_text(
         generer_rapport_solvabilite(
-            id_emprunteur_bic, score, contributions, engagements, historique_retards
+            id_emprunteur_bic, score, contributions, engagements, historique_retards, bornes_bandes
         ),
         encoding="utf-8",
     )

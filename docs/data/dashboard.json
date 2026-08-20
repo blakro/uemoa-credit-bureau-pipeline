@@ -1,0 +1,238 @@
+{
+  "bandeau": {
+    "nb_declarations_traitees": 144,
+    "taux_acceptation_global": 0.8342079370285339,
+    "nb_emprunteurs_consolides": 2331,
+    "auc_modele": 0.6642058996502306
+  },
+  "classement_declarants": [
+    {
+      "code_declarant": "SF000002",
+      "raison_sociale": "SFD Solidarité Rurale",
+      "taux_rejet": 0.49297658862876254
+    },
+    {
+      "code_declarant": "EF000004",
+      "raison_sociale": "EF Kappa Services",
+      "taux_rejet": 0.3641434262948207
+    },
+    {
+      "code_declarant": "BQ000005",
+      "raison_sociale": "Banque Étoile du Fleuve",
+      "taux_rejet": 0.3296969696969697
+    },
+    {
+      "code_declarant": "BQ000004",
+      "raison_sociale": "Banque Horizon Sahélien",
+      "taux_rejet": 0.27862171174509076
+    },
+    {
+      "code_declarant": "BQ000006",
+      "raison_sociale": "Banque Oméga du Ténéré",
+      "taux_rejet": 0.16223832528180354
+    },
+    {
+      "code_declarant": "SF000001",
+      "raison_sociale": "SFD Espoir Niamey",
+      "taux_rejet": 0.11166666666666666
+    },
+    {
+      "code_declarant": "EF000003",
+      "raison_sociale": "EF Delta Investissement",
+      "taux_rejet": 0.058530510585305104
+    },
+    {
+      "code_declarant": "BQ000003",
+      "raison_sociale": "Banque Concorde UEMOA",
+      "taux_rejet": 0.05094263939029282
+    },
+    {
+      "code_declarant": "EF000002",
+      "raison_sociale": "EF Gamma Crédit",
+      "taux_rejet": 0.04534883720930233
+    },
+    {
+      "code_declarant": "BQ000001",
+      "raison_sociale": "Banque Alpha du Sahel",
+      "taux_rejet": 0.0063264445381695485
+    },
+    {
+      "code_declarant": "EF000001",
+      "raison_sociale": "EF Béta Finances",
+      "taux_rejet": 0.005606728073688426
+    },
+    {
+      "code_declarant": "BQ000002",
+      "raison_sociale": "Banque Zénith du Niger",
+      "taux_rejet": 0.005422153369481022
+    }
+  ],
+  "top_erreurs": [
+    {
+      "code": "E002",
+      "occurrences": 831
+    },
+    {
+      "code": "E004",
+      "occurrences": 440
+    },
+    {
+      "code": "E011",
+      "occurrences": 435
+    },
+    {
+      "code": "E008",
+      "occurrences": 428
+    },
+    {
+      "code": "E005",
+      "occurrences": 428
+    },
+    {
+      "code": "E006",
+      "occurrences": 424
+    },
+    {
+      "code": "E010",
+      "occurrences": 423
+    },
+    {
+      "code": "E001",
+      "occurrences": 418
+    },
+    {
+      "code": "E003",
+      "occurrences": 410
+    },
+    {
+      "code": "E014",
+      "occurrences": 396
+    }
+  ],
+  "evolution_mensuelle": {
+    "arretes": [
+      "2025-08-31",
+      "2025-09-30",
+      "2025-10-31",
+      "2025-11-30",
+      "2025-12-31",
+      "2026-01-31",
+      "2026-02-28",
+      "2026-03-31",
+      "2026-04-30",
+      "2026-05-31",
+      "2026-06-30",
+      "2026-07-31"
+    ],
+    "series": [
+      {
+        "profil": "excellent",
+        "taux_rejet": [
+          0.014354066985645933,
+          0.004310344827586207,
+          0.001937984496124031,
+          0.0,
+          0.0052173913043478265,
+          0.004918032786885246,
+          0.0062402496099844,
+          0.004457652303120356,
+          0.008534850640113799,
+          0.002717391304347826,
+          0.007792207792207792,
+          0.008793969849246231
+        ]
+      },
+      {
+        "profil": "moyen",
+        "taux_rejet": [
+          0.051932367149758456,
+          0.3796095444685466,
+          0.047244094488188976,
+          0.22539098436062557,
+          0.0627147766323024,
+          0.06097560975609756,
+          0.21472868217054264,
+          0.04681784930504755,
+          0.2077831827658096,
+          0.043478260869565216,
+          0.21849271690943636,
+          0.20561317876754118
+        ]
+      },
+      {
+        "profil": "defaillant",
+        "taux_rejet": [
+          0.17551963048498845,
+          0.4288659793814433,
+          0.7407407407407407,
+          0.488013698630137,
+          0.4935275080906149,
+          0.14241960183767227,
+          0.14074074074074075,
+          0.4755244755244755,
+          0.4725130890052356,
+          0.15894868585732166,
+          0.16,
+          0.4205069124423963
+        ]
+      }
+    ]
+  },
+  "completude_par_champ": [
+    {
+      "champ": "identite_principale",
+      "taux_completude": 0.9792112199731436
+    },
+    {
+      "champ": "piece_identification",
+      "taux_completude": 0.9962202218132988
+    },
+    {
+      "champ": "telephone",
+      "taux_completude": 1.0
+    },
+    {
+      "champ": "date_octroi",
+      "taux_completude": 1.0
+    },
+    {
+      "champ": "date_echeance",
+      "taux_completude": 1.0
+    },
+    {
+      "champ": "montant_octroye",
+      "taux_completude": 1.0
+    },
+    {
+      "champ": "encours",
+      "taux_completude": 1.0
+    },
+    {
+      "champ": "classification",
+      "taux_completude": 1.0
+    }
+  ],
+  "distribution_scores": {
+    "bandes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "nb_emprunteurs": [
+      340,
+      292,
+      298,
+      278,
+      297
+    ],
+    "taux_defaut_observe": [
+      0.10882352941176471,
+      0.14726027397260275,
+      0.1644295302013423,
+      0.20503597122302158,
+      0.3771043771043771
+    ]
+  }
+}

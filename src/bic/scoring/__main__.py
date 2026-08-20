@@ -11,7 +11,7 @@ import pandas as pd
 from bic.generator.profiles import get_declarant_profiles
 from bic.generator.synthetic import JeuDeDonnees, generer_jeu_de_donnees, liste_arretes
 from bic.identity.cluster import EmprunteurAResoudre, resoudre_identites
-from bic.reporting.solvabilite import ecrire_rapport_solvabilite
+from bic.reporting.solvabilite import calculer_cutoffs_bandes, ecrire_rapport_solvabilite
 from bic.scoring.evaluate import evaluer, separer_train_test
 from bic.scoring.features import COLONNES_FEATURES, construire_jeu_de_features
 from bic.scoring.scorecard import Scorecard, calculer_score, entrainer_scorecard
@@ -70,6 +70,7 @@ def _construire_rapport(
     jeu: JeuDeDonnees,
     mapping_bic: dict[str, str],
     observation: dict,
+    bornes_bandes: tuple[float, float, float, float],
 ) -> Path:
     score, contributions = calculer_score(scorecard, observation)
 
@@ -109,7 +110,7 @@ def _construire_rapport(
 
     chemin = DOSSIER_SORTIE / "rapports_solvabilite" / f"{id_emprunteur_bic}.html"
     ecrire_rapport_solvabilite(
-        chemin, id_emprunteur_bic, score, contributions, engagements, historique
+        chemin, id_emprunteur_bic, score, contributions, engagements, historique, bornes_bandes
     )
     return chemin
 
@@ -122,8 +123,15 @@ def _rapport(id_emprunteur_bic: str, seed: int) -> None:
     if ligne.empty:
         raise SystemExit(f"Emprunteur {id_emprunteur_bic!r} introuvable dans le jeu de données.")
 
+    tous_les_scores = features.apply(
+        lambda ligne: calculer_score(scorecard, ligne[COLONNES_FEATURES].to_dict())[0], axis=1
+    )
+    bornes_bandes = calculer_cutoffs_bandes(tous_les_scores)
+
     observation = ligne.iloc[0][COLONNES_FEATURES].to_dict()
-    chemin = _construire_rapport(id_emprunteur_bic, scorecard, jeu, mapping_bic, observation)
+    chemin = _construire_rapport(
+        id_emprunteur_bic, scorecard, jeu, mapping_bic, observation, bornes_bandes
+    )
     print(f"Rapport de solvabilité écrit dans {chemin}")
 
 

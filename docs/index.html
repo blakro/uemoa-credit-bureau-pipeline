@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord — Pipeline BIC UEMOA</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bleu-fonce: #0b2e4f;
+    --bleu: #1d5b8a;
+    --bleu-clair: #4f8fbf;
+    --gris-fonce: #24303b;
+    --gris: #5b6b78;
+    --gris-clair: #eef1f4;
+    --blanc: #ffffff;
+    --rouge: #b3392c;
+    --vert: #2f7d5f;
+    --ombre: 0 1px 3px rgba(11, 46, 79, 0.12);
+    --rayon: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--gris-clair);
+    color: var(--gris-fonce);
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--bleu-fonce), var(--bleu));
+    color: var(--blanc);
+    padding: 1.5rem 1.25rem;
+  }
+
+  header h1 {
+    margin: 0 0 0.3rem;
+    font-size: 1.4rem;
+  }
+
+  header p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .disclaimer {
+    background: #fff3cd;
+    color: #664d03;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 1.25rem;
+  }
+
+  .bandeau {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .carte-stat {
+    background: var(--blanc);
+    border-radius: var(--rayon);
+    box-shadow: var(--ombre);
+    padding: 1rem 1.1rem;
+  }
+
+  .carte-stat .valeur {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--bleu-fonce);
+  }
+
+  .carte-stat .libelle {
+    font-size: 0.82rem;
+    color: var(--gris);
+    margin-top: 0.2rem;
+  }
+
+  .grille-graphiques {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 1rem;
+  }
+
+  .carte-graphique {
+    background: var(--blanc);
+    border-radius: var(--rayon);
+    box-shadow: var(--ombre);
+    padding: 1.1rem;
+  }
+
+  .carte-graphique.pleine-largeur {
+    grid-column: 1 / -1;
+  }
+
+  .carte-graphique h2 {
+    margin: 0 0 0.8rem;
+    font-size: 1rem;
+    color: var(--bleu-fonce);
+  }
+
+  .conteneur-canvas {
+    position: relative;
+    height: 280px;
+  }
+
+  #message-etat {
+    text-align: center;
+    color: var(--gris);
+    padding: 3rem 1rem;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--gris);
+    font-size: 0.8rem;
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .conteneur-canvas { height: 240px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pipeline de déclaration au Bureau d'Information sur le Crédit (BIC) — UEMOA</h1>
+  <p>Simulation de bout en bout : validation déclarative, résolution d'identité et scoring de solvabilité.</p>
+</header>
+<div class="disclaimer">
+  ⚠️ Données 100&nbsp;% synthétiques. Aucun établissement réel, aucune personne réelle. Voir DISCLAIMER.md.
+</div>
+
+<main>
+  <div id="message-etat">Chargement du tableau de bord…</div>
+
+  <div id="contenu" style="display:none">
+    <section class="bandeau">
+      <div class="carte-stat">
+        <div class="valeur" id="stat-declarations">—</div>
+        <div class="libelle">Déclarations traitées</div>
+      </div>
+      <div class="carte-stat">
+        <div class="valeur" id="stat-acceptation">—</div>
+        <div class="libelle">Taux d'acceptation global</div>
+      </div>
+      <div class="carte-stat">
+        <div class="valeur" id="stat-emprunteurs">—</div>
+        <div class="libelle">Emprunteurs consolidés</div>
+      </div>
+      <div class="carte-stat">
+        <div class="valeur" id="stat-auc">—</div>
+        <div class="libelle">AUC du modèle de scoring</div>
+      </div>
+    </section>
+
+    <section class="grille-graphiques">
+      <div class="carte-graphique">
+        <h2>Déclarants classés par taux de rejet</h2>
+        <div class="conteneur-canvas"><canvas id="graphique-declarants"></canvas></div>
+      </div>
+
+      <div class="carte-graphique">
+        <h2>Top 10 des codes d'erreur les plus fréquents</h2>
+        <div class="conteneur-canvas"><canvas id="graphique-erreurs"></canvas></div>
+      </div>
+
+      <div class="carte-graphique pleine-largeur">
+        <h2>Évolution mensuelle du taux de rejet, par profil de déclarant</h2>
+        <div class="conteneur-canvas"><canvas id="graphique-evolution"></canvas></div>
+      </div>
+
+      <div class="carte-graphique">
+        <h2>Complétude déclarative par champ</h2>
+        <div class="conteneur-canvas"><canvas id="graphique-completude"></canvas></div>
+      </div>
+
+      <div class="carte-graphique">
+        <h2>Distribution des scores et taux de défaut observé</h2>
+        <div class="conteneur-canvas"><canvas id="graphique-scores"></canvas></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Généré par <code>scripts/run_pipeline.py</code> à partir de données synthétiques.
+  <a href="https://github.com/blakro/uemoa-credit-bureau-pipeline">Code source</a>
+</footer>
+
+<script>
+  const COULEURS = {
+    bleuFonce: "#0b2e4f",
+    bleu: "#1d5b8a",
+    bleuClair: "#4f8fbf",
+    rouge: "#b3392c",
+    orange: "#c98a2e",
+    vert: "#2f7d5f",
+    gris: "#8a97a3",
+  };
+  const PALETTE_PROFILS = { excellent: COULEURS.vert, moyen: COULEURS.orange, defaillant: COULEURS.rouge };
+  const PALETTE_BANDES = ["#2f7d5f", "#5c9a5f", "#c98a2e", "#c9662e", "#b3392c"];
+
+  const formatPourcentage = (v) => `${(v * 100).toFixed(1)} %`;
+
+  async function chargerTableauDeBord() {
+    let donnees;
+    try {
+      const reponse = await fetch("data/dashboard.json");
+      if (!reponse.ok) throw new Error(`HTTP ${reponse.status}`);
+      donnees = await reponse.json();
+    } catch (erreur) {
+      document.getElementById("message-etat").textContent =
+        "Tableau de bord indisponible : docs/data/dashboard.json n'a pas encore été généré. " +
+        "Exécutez scripts/run_pipeline.py pour le produire.";
+      return;
+    }
+
+    document.getElementById("message-etat").style.display = "none";
+    document.getElementById("contenu").style.display = "block";
+
+    document.getElementById("stat-declarations").textContent = donnees.bandeau.nb_declarations_traitees;
+    document.getElementById("stat-acceptation").textContent = formatPourcentage(donnees.bandeau.taux_acceptation_global);
+    document.getElementById("stat-emprunteurs").textContent = donnees.bandeau.nb_emprunteurs_consolides;
+    document.getElementById("stat-auc").textContent = donnees.bandeau.auc_modele.toFixed(3);
+
+    Chart.defaults.font.family = "Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+    Chart.defaults.color = "#5b6b78";
+
+    // --- Classement des déclarants ---
+    const declarants = donnees.classement_declarants;
+    new Chart(document.getElementById("graphique-declarants"), {
+      type: "bar",
+      data: {
+        labels: declarants.map((d) => d.raison_sociale),
+        datasets: [
+          {
+            label: "Taux de rejet",
+            data: declarants.map((d) => d.taux_rejet),
+            backgroundColor: COULEURS.bleu,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { callback: formatPourcentage }, beginAtZero: true },
+        },
+      },
+    });
+
+    // --- Top erreurs ---
+    const erreurs = donnees.top_erreurs;
+    new Chart(document.getElementById("graphique-erreurs"), {
+      type: "bar",
+      data: {
+        labels: erreurs.map((e) => e.code),
+        datasets: [
+          {
+            label: "Occurrences",
+            data: erreurs.map((e) => e.occurrences),
+            backgroundColor: COULEURS.bleuClair,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } },
+      },
+    });
+
+    // --- Évolution mensuelle ---
+    const evolution = donnees.evolution_mensuelle;
+    new Chart(document.getElementById("graphique-evolution"), {
+      type: "line",
+      data: {
+        labels: evolution.arretes,
+        datasets: evolution.series.map((s) => ({
+          label: s.profil,
+          data: s.taux_rejet,
+          borderColor: PALETTE_PROFILS[s.profil] || COULEURS.gris,
+          backgroundColor: PALETTE_PROFILS[s.profil] || COULEURS.gris,
+          tension: 0.25,
+          fill: false,
+        })),
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { ticks: { callback: formatPourcentage }, beginAtZero: true } },
+      },
+    });
+
+    // --- Complétude par champ ---
+    const completude = donnees.completude_par_champ;
+    new Chart(document.getElementById("graphique-completude"), {
+      type: "bar",
+      data: {
+        labels: completude.map((c) => c.champ),
+        datasets: [
+          {
+            label: "Taux de complétude",
+            data: completude.map((c) => c.taux_completude),
+            backgroundColor: COULEURS.vert,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { min: 0, max: 1, ticks: { callback: formatPourcentage } } },
+      },
+    });
+
+    // --- Distribution des scores ---
+    const distribution = donnees.distribution_scores;
+    new Chart(document.getElementById("graphique-scores"), {
+      data: {
+        labels: distribution.bandes.map((b) => `Bande ${b}`),
+        datasets: [
+          {
+            type: "bar",
+            label: "Nombre d'emprunteurs",
+            data: distribution.nb_emprunteurs,
+            backgroundColor: PALETTE_BANDES,
+            order: 2,
+            yAxisID: "y",
+          },
+          {
+            type: "line",
+            label: "Taux de défaut observé",
+            data: distribution.taux_defaut_observe,
+            borderColor: COULEURS.bleuFonce,
+            backgroundColor: COULEURS.bleuFonce,
+            yAxisID: "y1",
+            order: 1,
+            tension: 0.25,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { position: "left", beginAtZero: true, title: { display: true, text: "Emprunteurs" } },
+          y1: {
+            position: "right",
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            ticks: { callback: formatPourcentage },
+            title: { display: true, text: "Taux de défaut" },
+          },
+        },
+      },
+    });
+  }
+
+  chargerTableauDeBord();
+</script>
+</body>
+</html>
