@@ -43,8 +43,15 @@ class _UnionFind:
         return racine
 
     def union(self, a: str, b: str) -> None:
+        # Le représentant retenu est toujours le plus petit lexicographiquement,
+        # pour que le clustering final ne dépende pas de l'ordre de traitement
+        # des paires (lui-même sensible à la randomisation du hachage des `set`).
         racine_a, racine_b = self.find(a), self.find(b)
-        if racine_a != racine_b:
+        if racine_a == racine_b:
+            return
+        if racine_a < racine_b:
+            self._parent[racine_b] = racine_a
+        else:
             self._parent[racine_a] = racine_b
 
 

@@ -84,6 +84,24 @@ def test_resoudre_identites_fusionne_par_numero_piece() -> None:
     assert resultat["C"] != resultat["A"]
 
 
+def test_resoudre_identites_est_stable_quel_que_soit_l_ordre_d_entree() -> None:
+    """L'id_emprunteur_bic attribué à un cluster ne doit pas dépendre de l'ordre des entrées."""
+    entrees = [
+        EmprunteurAResoudre(
+            "A", "PP", "Issoufou", "Amadou", None, "1985-04-12", "NE-CNI-12345678", None
+        ),
+        EmprunteurAResoudre(
+            "B", "PP", "ISSOUFOU", "A.", None, "1985-04-12", "NE-CNI-12345678", None
+        ),
+        EmprunteurAResoudre(
+            "C", "PP", "Traore", "Fatimata", None, "1970-06-01", "NE-CNI-99999999", None
+        ),
+    ]
+    resultat_ordre_original = resoudre_identites(entrees)
+    resultat_ordre_inverse = resoudre_identites(list(reversed(entrees)))
+    assert resultat_ordre_original == resultat_ordre_inverse
+
+
 # ============================= évaluation décisive =============================
 
 
