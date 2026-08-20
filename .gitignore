@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Projet BIC : données générées, jamais commitées
+data/generated/*
+!data/generated/.gitkeep
+*.db
+
